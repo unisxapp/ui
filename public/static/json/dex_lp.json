@@ -1,0 +1,4 @@
+[ 
+    {"dex": "UNISWAP", "s1": "uni.FTSE", "s2": "USDC", "token": "UMA | uni.FTSE-USDC | LP", "decimals": "18", "address": "0x0000000000000000000000000000000000000000"},
+    {"dex": "UNISWAP", "s1": "uni.VIX", "s2": "USDT", "token": "UMA | uni.VIX-USDT | LP", "decimals": "18", "address": "0x0000000000000000000000000000000000000000"}
+]

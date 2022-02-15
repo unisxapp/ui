@@ -1,0 +1,166 @@
+.j-between {
+  justify-content: space-between;
+}
+.j-center {
+  justify-content: center;
+}
+.j-end {
+  justify-content: end;
+}
+.flex-collumn {
+  display: flex;
+  flex-direction: column;
+}
+.but_flex {
+  margin-top: 40px;
+}
+.mt-auto {
+  margin-top: auto;
+}
+.mb-auto {
+  margin-bottom: auto;
+}
+.lr-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.mb-10 {
+  margin-bottom: 10px;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+.select-wrapp {
+  height: 42px;
+}
+.ml-0 {
+  margin-left: 0;
+}
+.flex-row .select-wrapp,
+.flex-row .input-wrapp {
+  width: 25%;
+}
+.flex-row-2 input,
+.flex-row-2 .input-wrapp {
+  width: 45%;
+}
+.flex-row-2 .input-wrapp input {
+  width: 100%;
+}
+.mr-10 {
+  margin-right: 10px;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+.ml-a {
+  margin-left: auto;
+}
+.radios {
+  display: flex;
+  align-items: center;
+}
+.radios input[type="radio"] {
+  width: auto;
+  height: auto;
+  margin: 0 5px 1px;
+}
+.radios label {
+  margin: 0;
+}
+.half-row {
+  width: 52%;
+}
+.align-center {
+  align-items: center;
+}
+h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.color-red {
+  color: red;
+}
+.color-green {
+  color: green;
+}
+.disabled:disabled {
+  opacity: 0.5;
+}
+.disabled:hover:disabled {
+  background-color: transparent;
+}
+.blueb.disabled:hover:disabled {
+  background: linear-gradient(
+      0deg,
+      rgba(21, 0, 153, 0.3008) -18.27%,
+      rgba(255, 255, 255, 0.6272) 171.15%
+    ),
+    linear-gradient(0deg, #408cff, #408cff), #f9c02f;
+}
+.orangebut.disabled:disabled::before {
+  opacity: 0;
+}
+.orangebut.disabled:hover:disabled {
+  background: linear-gradient(0deg, #541900 0%, rgba(255, 255, 255, 0.98) 235%), #f9c02f;
+}
+.description.mb-10 {
+  padding: 0 30px;
+}
+hr {
+  width: 100%;
+  border-top: 1px solid #000;
+  margin: 5px 0;
+}
+.w-45 {
+  width: 45%;
+}
+
+.cards_in_tab h3 {
+  margin: 20px 0;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 110%;
+  letter-spacing: -0.01em;
+  color: #161828;
+}
+
+.info-message {
+  padding: 10px 0;
+  margin-bottom: 10px;
+  text-align: center;
+  border-radius: 4px;
+  min-height: 39.5px;
+}
+
+.info-message-bg {
+  background: #fff8df;
+}
+
+.info-message-text {
+  font-size: 15px;
+  line-height: 130%;
+  transition: 0.3s;
+  letter-spacing: -0.01em;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.cur-p {
+  cursor: pointer;
+}
+.ml-45 {
+  margin-left: 45px;
+}
+.p-relative {
+  position: relative;
+}

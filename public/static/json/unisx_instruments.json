@@ -1,0 +1,20 @@
+[
+	{
+		"Name": "uSPAC10",
+		"decimals": "6",
+		"Type": "EMP",
+		"DerivativeAddress": "0x79572Ef0c78fa199dCF6df631C9A6779F4c1D581",
+		"TokenAddress": "0x683B91E1A82B6996d59EcE293D5697978c10b130",
+		"CollateralName": "USDC",
+		"CollateralAddress": "0xe22da380ee6B445bb8273C81944ADEB6E8450422",
+		"CollateralDecimals": "6",
+		"CR": "1.5",
+		"DEX":
+		[
+			{"Pair": "Sushiswap uSPAC10-test/USDC", "PoolAddress": "0xd339daba500e0628ba3f348babf972925a37ea3d"},
+			{"Pair": "Sushiswap UNISX/USDC", "PoolAddress": "0x01e7fd992899b6aed1eabad46db51c08c64ace3e"}
+		],
+		"Rewards": "20",
+		"Description": "A synthetic token that tracks the index of the 10 most active SPACs stocks can be used for speculative purposes and allows the user to earn on price movements in one of the most interesting markets without centralized intermediaries such as exchanges and brokers."
+	}
+]
