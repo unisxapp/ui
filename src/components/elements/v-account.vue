@@ -11,6 +11,9 @@
 <script>
 /* eslint-disable no-unused-vars */
 import {mapGetters, mapActions} from 'vuex';
+
+import {setLocalStorage} from '../../helpers';
+
 import {connectMetamask, accountPromise} from '../../core/metamask';
 import {ethPromise} from '../../core/eth';
 import errorStatus from '../../helpers/errors';
@@ -40,6 +43,7 @@ export default {
                 this.onClickConnect(this.USER_ACCOUNT);
             } catch(e) {
                 this.GET_isCONNECTED(false);
+                alert(e);
                 console.error(errorStatus('connect'));
             }
         },

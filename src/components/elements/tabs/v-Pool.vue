@@ -13,7 +13,7 @@
                             @input="consider('firstToken')"
                         >
                         <div class="flex j-between mb-0"><span>In the pool:</span>
-                        <span class="ml-a">{{ selectedItem.firstTokenAmountInPool }}</span>
+                        <span class="ml-a mw-70-ec">{{ selectedItem.firstTokenAmountInPool }}</span>
                         <span
                             v-if="+selectedItem.firstTokenAmountInPool > 0"
                             class="color-green cur-p"
@@ -51,7 +51,7 @@
                             @input="consider('secondToken')" 
                         >
                         <div class="flex j-between mb-0"><span>In the pool:</span>
-                        <span class="ml-a">{{ selectedItem.secondTokenAmountInPool }}</span>
+                        <span class="ml-a mw-70-ec">{{ selectedItem.secondTokenAmountInPool }}</span>
                         <span
                             v-if="+selectedItem.secondTokenAmountInPool > 0"
                             class="color-green cur-p"
@@ -85,7 +85,7 @@
 <script>
 import {mapActions, mapGetters} from 'vuex';
 // eslint-disable-next-line no-unused-vars
-import { addLiquidity, getAccount, getPoolProperties, removeLiquidity } from '../../../core/eth';
+import { addLiquidity, getAccount, getPoolProperties, removeAllLiquidity, removeLiquidity } from '../../../core/eth';
 
 // eslint-disable-next-line no-unused-vars
 import {round, separate, toDote, toFix} from '../../../helpers';
@@ -224,7 +224,14 @@ export default {
                 }
 
                 try {
-                    const pool = removeLiquidity(tokenCode, USDCAmount, tokenAmount);
+                    let pool;
+                    if (+this.selectedItem.firstTokenAmount === +this.selectedItem.firstTokenAmountInPool) {
+                        pool = removeAllLiquidity(tokenCode);
+                    } else {
+                        pool = removeLiquidity(tokenCode, USDCAmount, tokenAmount);
+                    }
+                    
+                    
                     this.onMessage(errorStatus('proccess'));
                     console.error(errorStatus('proccess'));
                     for await (let value of pool) {
@@ -241,6 +248,8 @@ export default {
                     console.error(e);
                     return
                 }
+
+
                 console.log('unPool success!'); 
             }
         },
@@ -259,9 +268,11 @@ export default {
         toPrice(token) {
             switch (token) {
                 case 'firstToken':
-                    return round((toDote(this.selectedItem.firstTokenAmount) * this.selectedItem.tokenPrice), 4).toString();
+                    // return round((toDote(this.selectedItem.firstTokenAmount) * this.selectedItem.tokenPrice), 4).toString();
+                    return (+this.selectedItem.firstTokenAmount * this.selectedItem.tokenPrice).toString();
                 case 'secondToken':
-                    return round((toDote(this.selectedItem.secondTokenAmount) / this.selectedItem.tokenPrice), 4).toString();
+                    // return round((toDote(this.selectedItem.secondTokenAmount) / this.selectedItem.tokenPrice), 4).toString();
+                    return (+this.selectedItem.secondTokenAmount / this.selectedItem.tokenPrice).toString();
                 default:
                     return token;
             }
@@ -278,10 +289,14 @@ export default {
             this.selectedItem.tokenCode = pair.tokenCode;
             this.selectedItem.firstToken = pair.firstToken;
             this.selectedItem.secondToken = pair.secondToken;
-            this.selectedItem.firstTokenAmountInPool = (+selectedItemData.tokenAvailableToWithdrawFormatted).toFixed(toFix).toString();
-            this.selectedItem.secondTokenAmountInPool = (+selectedItemData.USDCAvailableToWithdrawFormatted).toFixed(toFix).toString();
+            // this.selectedItem.firstTokenInWallet = (+selectedItemData.tokenBalanceFormatted).toFixed(toFix).toString();
+            // this.selectedItem.secondTokenInWallet = (+selectedItemData.USDCBalanceFormatted).toFixed(toFix).toString();
+            // this.selectedItem.firstTokenAmountInPool = (+selectedItemData.tokenAvailableToWithdrawFormatted).toFixed(toFix).toString();
+            // this.selectedItem.secondTokenAmountInPool = (+selectedItemData.USDCAvailableToWithdrawFormatted).toFixed(toFix).toString();
             this.selectedItem.firstTokenInWallet = selectedItemData.tokenBalanceFormatted;
             this.selectedItem.secondTokenInWallet = selectedItemData.USDCBalanceFormatted;
+            this.selectedItem.firstTokenAmountInPool = selectedItemData.tokenAvailableToWithdrawFormatted;
+            this.selectedItem.secondTokenAmountInPool = selectedItemData.USDCAvailableToWithdrawFormatted;
             this.selectedItem.firstTokenAmount = '';
             this.selectedItem.secondTokenAmount = '';
             this.selectedItem.tokenPrice = (+selectedItemData.price);

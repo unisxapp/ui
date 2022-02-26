@@ -261,6 +261,13 @@ async function getPositionCreationTime(address) {
   }
 }
 
+async function getMinterRewardPaid(address) {
+  const events = await UNISXToken.queryFilter(
+    UNISXToken.filters.Transfer(getChainConfig().rewardPayer, address)
+  )
+  return events.reduce((total, e) => total.add(e.args.amount), ethers.BigNumber.from(0))
+}
+
 export async function getPosition(address = window.ethereum.selectedAddress){
   const [pos, positionCreationTime, currentTime]  = await Promise.all([
     promisedProperties({
@@ -268,6 +275,7 @@ export async function getPosition(address = window.ethereum.selectedAddress){
       tokensOutstanding: financialContract.positions(address).then(pos =>
         pos.tokensOutstanding.rawValue
       ),
+      minterRewardPaid: getMinterRewardPaid(address),
     }),
     getPositionCreationTime(address),
     (await provider.getBlock('latest')).timestamp,
@@ -315,9 +323,13 @@ export async function getPosition(address = window.ethereum.selectedAddress){
     minterRewardFormatted: minterReward.then(reward => reward.rewardFormatted),
     collateralAvailableForFastWithdrawal,
     collateralAvailableForFastWithdrawalFormatted: formatUnits(collateralAvailableForFastWithdrawal, collateralTokenDecimals),
+
     positionAgeSeconds: positionCreationTime == null
       ? null
       : currentTime - positionCreationTime,
+
+    minterRewardPaid: pos.minterRewardPaid,
+    minterRewardPaidFormatted: formatUnits(pos.minterRewardPaid, UNISXDecimals),
   }
 }
 
@@ -331,9 +343,9 @@ export function toBN(val, decimals) {
     if(matches == null) {
       throw new Error('Invalid number: ' + val)
     }
-    const [_, whole, __, fractional = ''] = matches
+    let [_, whole, __, fractional = ''] = matches
     if (fractional.length > decimals) {
-      throw new Error(`Too many decimals, max is ${decimals}, in ${val}`)
+      fractional = fractional.slice(0, decimals)
     }
     return BN(whole + fractional)
       .mul(
@@ -630,6 +642,50 @@ export async function* removeLiquidity(tokenCode, USDCAmount, tokenAmount, to = 
   const liquidity = USDCAmount.mul(totalLiquidity).div(reserveUSDC)
 
   yield* ensureAllowance(liquidity, pair, uniswapV2Router.address)
+
+  yield {message: 'Sending transaction'}
+  const tx = await uniswapV2Router.removeLiquidity(
+    USDC.address,
+    token.address,
+    liquidity,
+    amountMin(USDCAmount),
+    amountMin(tokenAmount),
+    to,
+    current + 30 * 60 // thirty minutes deadline, same as in sushiswap client
+  )
+  yield {message: 'Waiting for transaction', txHash: tx.hash}
+  await tx.wait()
+}
+
+export async function* removeAllLiquidity(tokenCode, to = window.ethereum.selectedAddress) {
+  yield {message: 'Preparing'}
+
+  const {token, pair} = LPPairs[tokenCode]
+  if(token == null) {
+    throw new Error('unknown token')
+  }
+
+  const current = (await provider.getBlock('latest')).timestamp
+
+  const [liquidity, reserves, token0, totalLiquidity] = await Promise.all(
+    [
+      pair.balanceOf(window.ethereum.selectedAddress), 
+      pair.getReserves(), 
+      pair.token0(), 
+      pair.totalSupply()
+    ]
+  )
+  const [reserveUSDC, reserveToken] = token0 == USDC.address
+  ? [reserves[0], reserves[1]]
+  : [reserves[1], reserves[0]]
+
+  const USDCAmount = reserveUSDC.mul(liquidity).div(totalLiquidity)
+  const tokenAmount = reserveToken.mul(liquidity).div(totalLiquidity)
+
+  yield* ensureAllowance(liquidity, pair, uniswapV2Router.address)
+
+  console.log('USDCAmount', USDCAmount.toString())
+  console.log('tokenAmount', tokenAmount.toString())
 
   yield {message: 'Sending transaction'}
   const tx = await uniswapV2Router.removeLiquidity(

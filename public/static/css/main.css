@@ -606,6 +606,10 @@ table thead th:nth-child(1) {
   padding-left: 30px;
 }
 
+.table > tbody > tr > td:last-child {
+  padding-right: 5px;
+}
+
 table thead th:last-child {
   border-top-right-radius: 8px;
 }

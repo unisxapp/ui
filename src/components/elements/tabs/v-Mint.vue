@@ -378,13 +378,21 @@ export default {
             switch (token) {
                 case 'synt':
                     this.synthetic.collateralAmount = this.selectedItemBalance.collateralAmountFormatted;
+                    // this.$refs.synt.value = this.synthetic.collateralAmount;
                     this.consider('collateralAmount');
                     this.$forceUpdate();
+                    // this.$refs.coll.value = this.synthetic.tokensAmount;
+                    // this.$refs.mintBtn.disabled = '';
+                    // this.$refs.burnBtn.disabled = '';
                     break;
                 case 'coll':
                     this.synthetic.tokensAmount = this.selectedItemBalance.collateralBalanceFormatted;
+                    // this.$refs.coll.value = this.synthetic.tokensAmount;
                     this.consider('tokensAmount');
                     this.$forceUpdate();
+                    // this.$refs.synt.value = this.synthetic.collateralAmount;
+                    // this.$refs.mintBtn.disabled = false;
+                    // this.$refs.burnBtn.disabled = false;
                     break;
             }
         },
@@ -405,8 +413,10 @@ export default {
         toPrice(token) {
             switch (token) {
                 case 'collateralAmount':
+                    // return round((toDote(this.synthetic.collateralAmount) * this.synthetic.cr * (this.INSTRUMENTS[0].Price / COLLATERAL_PRICE)), 4).toString();
                     return this.synthetic.collateralAmount ? collateralByTokenCurrency(this.synthetic.collateralAmount) : '';
                 case 'tokensAmount':
+                    // return round((toDote(this.synthetic.tokensAmount) / this.synthetic.cr * (COLLATERAL_PRICE / this.INSTRUMENTS[0].Price)), 4).toString();
                     return this.synthetic.tokensAmount ? tokenCurrencyByCollateral(this.synthetic.tokensAmount) : '';
                 default:
                     return token;

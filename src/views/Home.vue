@@ -14,7 +14,7 @@
                       <div class="after_h1_wrp">
                           <div class="ovh">
                               <p data-aos="fade-up" data-aos-delay="700" data-aos-duration="800" class="after_h1">
-                                New synthetic, collateral-backed tokens the price of which are tied to the quotes of various SPAC stock indexes, expanding the facilities for getting exposure on assets from traditional markets. Synthetics are created by depositing collateral into a smart contract and minting tokens backed by that collateral.
+                                New synthetic assets tied to the classical stock market - stocks, thematic ETFs, and SPAC indexes. Synthetic assets provide investors with greater access to prospective investments of the future and liquidity. Synthetics are created by depositing collateral into a smart contract and minting tokens backed by that collateral.
                             </p>
                           </div>
                             <router-link :to="{ name: 'Actions'}">
@@ -25,6 +25,13 @@
               </div>
           </div>
           <div class="parthers_wrp">
+              <!-- <div class="partners_list marquee">
+                <div class="logo_elem"><img src="../assets/img/logo.svg" alt=""></div>
+                <div class="logo_elem"><img src="../assets/img/logo.svg" alt=""></div>
+                <div class="logo_elem"><img src="../assets/img/logo.svg" alt=""></div>
+                <div class="logo_elem"><img src="../assets/img/logo.svg" alt=""></div>
+                <div class="logo_elem"><img src="../assets/img/logo.svg" alt=""></div>
+            </div> -->
           </div>
           <div class="howworks">
               <div class="container">
@@ -47,7 +54,7 @@
                                   <div class="hw_card_img" data-aos="fade-up" data-aos-delay="600" data-aos-duration="800"> 
                                       <img src="../assets/img/hw3.png" alt="">
                                       <p>Stake</p>
-                                      <span>Stake UNISX tokens and liquidity pool tokens to smart contract and earn additional UNISX tokens and utility xUNISX tokens.</span>
+                                      <span>Stake UNISX tokens and liquidity pool tokens to the smart contract and earn additional UNISX tokens and utility xUNISX tokens.</span>
                                   </div>
                               </div>
                               <div class="col-md-6 col-sm-6 col-xs-12">

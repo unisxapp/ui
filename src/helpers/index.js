@@ -2,7 +2,7 @@
 import axios from "axios";
 import {getPrice} from '../core/price';
 
-export const isDev = !(process.env.NODE_ENV === 'production');
+export const isDev = !(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'global');
 export const toFix = isDev ? 5 : 4;
 export const COLLATERAL_PRICE = 1;
 
@@ -16,6 +16,38 @@ export async function getJSONdata(url, commit = {}, action = '') {
                         console.error(error);
                         return [];
                     })
+}
+
+export async function loadTradingWidget(element, link) {
+    if (!element) return
+    if (!link) return
+    const html = `
+        <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/TVC-VIX/" rel="noopener" target="_blank"><span class="blue-text">VIX Quotes</span></a> by TradingView</div>
+        </div>
+    `;
+    element.innerHTML = html;
+    const widgetScript = document.createElement('script');
+    widgetScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+    widgetScript.innerHTML = `
+        {
+            "symbol": "${link}",
+            "width": 350,
+            "height": 220,
+            "locale": "en",
+            "dateRange": "12M",
+            "colorTheme": "light",
+            "trendLineColor": "rgba(41, 98, 255, 1)",
+            "underLineColor": "rgba(41, 98, 255, 0.3)",
+            "underLineBottomColor": "rgba(41, 98, 255, 0)",
+            "isTransparent": false,
+            "autosize": false,
+            "largeChartUrl": ""
+        }
+    `
+    const container = element.querySelector('.tradingview-widget-container');
+    if (container) container.insertAdjacentElement('beforeend', widgetScript);
 }
 
 export async function createPrice(json) {
@@ -55,6 +87,14 @@ export function setLocalStorage(key, value) {
     localStorage.setItem(key, value);
 }
 
+// function IsJsonString(str) {
+//     try {
+//         return JSON.parse(str);
+//     } catch (e) {
+//         return str;
+//     }
+// }
+
 export function separate(pair, separator = '/') {
     return pair.split(separator);
 }
@@ -74,6 +114,11 @@ export function defaultSelect(selector) {
     }
 }
 
+// export function truncate(v, p) {
+//     var s = Math.pow(10, p || 0);
+//     return Math.trunc(s * v) / s;
+// }
+
 export function truncate(number, digits) {
     var reg_ex = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)")
     var array = number.toString().match(reg_ex);
@@ -81,6 +126,8 @@ export function truncate(number, digits) {
 }
 
 export function euroDate(str) {
+    // const temp = str.split('.');
+    // return new Date(`${temp[1]}.${temp[0]}.${temp[2]}`);
     return new Date(str);
 }
 

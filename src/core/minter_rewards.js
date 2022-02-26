@@ -1,7 +1,7 @@
 /* eslint-disable no-unreachable */
 /* eslint-disable no-unused-vars */
-import {tokenCurrencyDecimals, financialContract, provider, ethPromise} from '../core/eth.js'
-import {CHAIN_CONFIG} from '../core/config.js'
+import {UNISXDecimals, tokenCurrencyDecimals, financialContract, provider, ethPromise} from '../core/eth.js'
+import {CHAIN_CONFIG, MINTER_REWARD_RATE} from '../core/config.js'
 import { ethers } from 'ethers'
 
 const BN = ethers.BigNumber.from
@@ -55,7 +55,7 @@ async function _contractCreationBlock(address, low, high){
 const contractCreationBlock = cached('creationBlock', 1, 'int', _contractCreationBlock)
 
 // returns latest block which timestamp is less or equal to given timestamp
-async function blockByTimestamp(timestamp, from, to){
+const blockByTimestamp = cached('blockByTimestamp', 1, 'int', async function blockByTimestamp(timestamp, from, to){
   async function blockByTimestampBinarySearch(from, to){
     // invariant: from.timestamp <= timestamp < to.timestamp
     if(from >= to){
@@ -79,18 +79,21 @@ async function blockByTimestamp(timestamp, from, to){
     }
   }
   return blockByTimestampBinarySearch(from, to)
-}
+})
 
 async function getSponsors(blockFrom, blockTo) {
+  console.time('getSponsors')
   const events = await financialContract.queryFilter(
     financialContract.filters.NewSponsor(null), 
     blockFrom,
     blockTo,
   )
+  console.timeEnd('getSponsors')
   return events.map(e => e.args.sponsor)
 }
 
 async function getAllEvents(blockFrom, blockTo) {
+  console.time('getAllEvents')
   const events = await financialContract.queryFilter(
     {
       address: financialContract.address,
@@ -99,6 +102,7 @@ async function getAllEvents(blockFrom, blockTo) {
     blockFrom,
     blockTo,
   )
+  console.timeEnd('getAllEvents')
   return events
 }
 
@@ -111,34 +115,41 @@ const getBlockTimestamp = cached('blockTimestamp', 1, 'int', async function getB
   return (await provider.getBlock(blockNumber)).timestamp
 })
 
+const getTotalTokensOutstanding = cached('totalTokensOutstanding', 1, 'bignumber', 
+  async function getTotalTokensOutstanding(blockTag) {
+    return financialContract.totalTokensOutstanding({blockTag})
+  })
+
 export async function getRewardsByDateStrings({
   dateFromString, 
   dateToString, 
-  rewardPerTokenDay, 
-  rewardTokenDecimals,
   sponsors,
 }) {
-  const dateFrom = new Date(Date.parse(dateFromString + "T00:00:00.000Z"))
+  const dateFrom = dateFromString == null 
+    ? null 
+    : new Date(Date.parse(dateFromString + "T00:00:00.000Z"))
 
   const dateTo = new Date(Date.parse(dateToString + "T00:00:00.000Z"))
   // find next date, so dateToString works as inclusive date
   dateTo.setDate(dateTo.getDate() + 1)
 
   const interval = [dateFrom, dateTo].map(date =>
-    Math.floor(date.getTime() / 1000)
+    date == null ? null : Math.floor(date.getTime() / 1000)
   )
 
   const latest = await provider.getBlockNumber()
 
-  const [from, to] = await Promise.all(interval.map(ts => blockByTimestamp(ts, 0, latest)))
+  const [from, to] = await Promise.all(interval.map(ts => 
+    ts == null 
+    ? null
+    : blockByTimestamp(ts, 0, latest))
+  )
 
-  return await getRewards({blockInterval: [from, to], rewardPerTokenDay, rewardTokenDecimals, sponsors})
+  return await getRewards({blockInterval: [from ?? -Infinity, to], sponsors})
 }
 
 export async function getRewards({
   blockInterval = [0, Infinity], 
-  rewardPerTokenDay, 
-  rewardTokenDecimals, 
   sponsors,
 }) {
   await ethPromise
@@ -149,8 +160,7 @@ export async function getRewards({
   const blockFrom = Math.max(creationBlock, blockInterval[0])
   const blockTo = Math.min(latest, blockInterval[1])
 
-  const [timestampFrom, __timestampTo, expirationTimestamp] = await Promise.all([
-    getBlockTimestamp(blockFrom),
+  const [__timestampTo, expirationTimestamp] = await Promise.all([
     getBlockTimestamp(blockTo),
     financialContract.expirationTimestamp().then(ts => ts.toNumber()),
   ])
@@ -161,48 +171,29 @@ export async function getRewards({
     ? await getSponsors(creationBlock, blockTo)
     : sponsors.map(s => ethers.utils.getAddress(s))
 
-  const [initialPositions, events] = await Promise.all([
-    Object.fromEntries(await Promise.all(sponsors.map(async address => {
-      return [address, await getPosition(financialContract.address, address, blockFrom)]
-    }))),
+  const allEvents = await getAllEvents(blockFrom, blockTo)
 
-    getAllEvents(
-      blockFrom, 
-      blockTo,
-    ).then(events => {
-      return events.filter(
-        e => e.args.sponsor != null
-        &&
-        sponsors.includes(e.args.sponsor)
-      )
-    })
-  ])
+  const blockNumbers = [
+    ...new Set([...allEvents.map(e => e.blockNumber), blockFrom])
+  ].sort((a,b) => a - b)
 
-  /* events should be already sorted by blockNumber, but make sure */
-  events.sort((a,b) => a.blockNumber - b.blockNumber)
+  const sponsorMap = Object.fromEntries(sponsors.map(sponsor => 
+    [sponsor, blockNumbers.map(blockNumber => ({blockNumber}))]
+  ))
 
-  const blockNumbers = new Set()
-  const sponsorMap = Object.fromEntries(sponsors.map(sponsor => [sponsor, []]))
+  const [blockNumberToTotalTokensOutstanding, blockNumberToTimestamp] = await Promise.all([
+    Promise.all(
+      blockNumbers.map(async number => {
+        return [number, await getTotalTokensOutstanding(number)]
+      })
+    ).then(Object.fromEntries),
 
-  for(let e of events){
-    blockNumbers.add(e.blockNumber, null)
-    const sponsor = e.args.sponsor
-    let blocks = sponsorMap[sponsor]
-    let block = blocks.find(b => b.blockNumber == e.blockNumber)
-    if(block == null){
-      block = {blockNumber: e.blockNumber, events: []}
-      blocks.push(block)
-    }
-    block.events.push(e.event)
-  }
-
-  const blockNumberToTimestamp = Object.fromEntries(
-    await Promise.all(
-      [...blockNumbers.keys()].map(async number => {
+    Promise.all(
+      blockNumbers.map(async number => {
         return [number, await getBlockTimestamp(number)]
       })
-    )
-  )
+    ).then(Object.fromEntries),
+  ])
 
   for(let [sponsor, blocks] of Object.entries(sponsorMap)){
     for(let block of blocks){
@@ -212,7 +203,7 @@ export async function getRewards({
 
   /* Remove all blocks that are later than timestampTo */
   for(let sponsor in sponsorMap) {
-    sponsorMap[sponsor] = sponsorMap[sponsor].filter(b => b.timestamp <= expirationTimestamp)
+    sponsorMap[sponsor] = sponsorMap[sponsor].filter(b => b.timestamp <= timestampTo)
   }
 
   await Promise.all(Object.entries(sponsorMap).map(async ([sponsor, blocks]) => {
@@ -223,44 +214,38 @@ export async function getRewards({
 
   const rewards = Object.fromEntries(Object.entries(sponsorMap).map(([sponsor, blocks]) => {
     let reward = BN(0)
-    let currentPos = initialPositions[sponsor]
-    // TODO: use start block if it is different from start ts
-    let currentTimestamp = timestampFrom
 
-    let blocksWithLastTS = blocks.concat([
-      {timestamp: timestampTo}
-    ])
-
-    for(let block of blocksWithLastTS) {
-      if(block.timestamp < currentTimestamp){
-        throw new Error('illegal state')
+    for(let i = 0; i < blocks.length; i++) {
+      const block = blocks[i]
+      const nextTimestamp = i == blocks.length - 1 ? timestampTo : blocks[i + 1].timestamp
+      if(block.timestamp > nextTimestamp){
+        throw new Error('illegal state - invalid block timestamp')
       }
-      const seconds = block.timestamp - currentTimestamp
-      reward = reward.add(currentPos.mul(seconds))
-      currentTimestamp = block.timestamp
-      /* not defined for last timestamp */
-      if(block.position != null) {
-        currentPos = block.position
+      const seconds = nextTimestamp - block.timestamp
+      // Avoid potential division by zero, if totalTokensOutstanding is zero
+      if(!block.position.eq(0)){
+        reward = reward.add(
+          block.position
+            .mul(seconds)
+            .mul(MINTER_REWARD_RATE)
+            .div(blockNumberToTotalTokensOutstanding[block.blockNumber])
+        )
       }
     }
 
-    const adjustedReward = reward
-        .mul(rewardPerTokenDay)
-        .mul(BN(10).pow(rewardTokenDecimals))
-        .div(BN(10).pow(tokenCurrencyDecimals))
-        .div(24*3600)
-    return [sponsor, adjustedReward]
+    return [sponsor, reward]
   }))
 
   const result = Object.fromEntries(Object.entries(sponsorMap).map(([sponsor, blocks]) => {
     const reward = rewards[sponsor]
+    const initialPosition = sponsorMap[sponsor][0].position
     return [
       sponsor, {
         reward, 
-        rewardFormatted: ethers.utils.formatUnits(reward, rewardTokenDecimals).toString(),
+        rewardFormatted: ethers.utils.formatUnits(reward, UNISXDecimals).toString(),
         blocks, 
-        initialPosition: initialPositions[sponsor],
-        initialPositionFormatted: ethers.utils.formatUnits(initialPositions[sponsor], tokenCurrencyDecimals).toString(),
+        initialPosition,
+        initialPositionFormatted: ethers.utils.formatUnits(initialPosition, tokenCurrencyDecimals).toString(),
       }
     ]
   }))

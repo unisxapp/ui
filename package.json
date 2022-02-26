@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "cross-env NODE_ENV=development vue-cli-service serve",
-    "build": "cross-env NODE_ENV=production vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build": "cross-env NODE_ENV=global vue-cli-service build",
+    "build-local": "cross-env NODE_ENV=production vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "predeploy": "npm run build-local",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "axios": "^0.24.0",
@@ -25,6 +28,7 @@
     "css-loader": "^6.5.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "gh-pages": "^3.2.3",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

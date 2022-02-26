@@ -8,8 +8,14 @@ export const CHAIN_CONFIG = {
     UNISXStakingRewards: "0x1Dd470C00452D11daF6502A90c1492A3059F49b9",
     SushiV2Router02: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
     USDC: '0xe22da380ee6B445bb8273C81944ADEB6E8450422',
+    rewardPayer: '0xa5025faba6e70b84f74e9b1113e5f7f4e7f4859f', // address of multisender contract
   },
 }
+
+export const MINTER_REWARD_RATE = Number(100_000n) * (Number(10n) ** Number(18n)) / Number(365n) / Number(24n) / Number(3600n)
+  // 100_000n * // 100_000 tokens to distribute per year
+  // (10n ** 18n) // decimals
+  // / 365n / 24n / 3600n // seconds per year
 
 export const USER_CR = '1.5'
 

@@ -164,3 +164,8 @@ input[type='number'] {
 .p-relative {
   position: relative;
 }
+.mw-70-ec {
+  max-width: 70px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
