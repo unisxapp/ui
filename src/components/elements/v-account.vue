@@ -1,6 +1,6 @@
 <template>
     <div class="h2_flex">
-        <button class="orangebut hidden">Vote</button>
+        <button v-if="isShowFaucet" @click="faucetClickHandle" class="orangebut">Faucet</button>
         <div class="account-id">
             <p v-if="NETWORK_ID">{{ NETWORK_ID }}</p>
             <p v-if="USER_ACCOUNT">{{ USER_ACCOUNT }}</p>
@@ -17,6 +17,7 @@ import {setLocalStorage} from '../../helpers';
 import {connectMetamask, accountPromise} from '../../core/metamask';
 import {ethPromise} from '../../core/eth';
 import errorStatus from '../../helpers/errors';
+import {faucet, isFaucetAvailable} from '../../core/faucet';
 
 export default {
     name: 'Account',
@@ -47,11 +48,24 @@ export default {
                 console.error(errorStatus('connect'));
             }
         },
+
+        async faucetClickHandle() {
+            try {
+                await faucet();
+                this.onClickConnect(this.USER_ACCOUNT);
+            } catch(e) {
+                alert(e);
+                console.error(errorStatus('connect'));
+            }
+        }
     },
     computed: {
         ...mapGetters([
             'USER_ACCOUNT', 'NETWORK_ID', 'isCONNECTED'
         ]),
+        isShowFaucet: function() {
+            return this.isCONNECTED && isFaucetAvailable();
+        }
     },
     mounted() {
         this.GET_NETWORK_ID();
