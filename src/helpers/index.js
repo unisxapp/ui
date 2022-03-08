@@ -1,10 +1,18 @@
 /* eslint-disable no-unused-vars */
 import axios from "axios";
-import {getPrice} from '../core/price';
 
-export const isDev = !(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'global');
+export const routerMode = (process.env.NODE_ENV === 'production') ? 'history' : 'hash';
+export const isDev = !(process.env.NODE_ENV === 'production');
 export const toFix = isDev ? 5 : 4;
 export const COLLATERAL_PRICE = 1;
+
+export const CHAIN_TYPE = {
+    1: 'Ethereum Main Network',
+    3: 'Ropsten Test Network',
+    4: 'Rinkeby Test Network',
+    5: 'Goerli Test Network',
+    42: 'Kovan Test Network'
+};
 
 export async function getJSONdata(url, commit = {}, action = '') {
     return await axios(url)
@@ -18,46 +26,14 @@ export async function getJSONdata(url, commit = {}, action = '') {
                     })
 }
 
-export async function loadTradingWidget(element, link) {
-    if (!element) return
-    if (!link) return
-    const html = `
-        <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-        <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/TVC-VIX/" rel="noopener" target="_blank"><span class="blue-text">VIX Quotes</span></a> by TradingView</div>
-        </div>
-    `;
-    element.innerHTML = html;
-    const widgetScript = document.createElement('script');
-    widgetScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
-    widgetScript.innerHTML = `
-        {
-            "symbol": "${link}",
-            "width": 350,
-            "height": 220,
-            "locale": "en",
-            "dateRange": "12M",
-            "colorTheme": "light",
-            "trendLineColor": "rgba(41, 98, 255, 1)",
-            "underLineColor": "rgba(41, 98, 255, 0.3)",
-            "underLineBottomColor": "rgba(41, 98, 255, 0)",
-            "isTransparent": false,
-            "autosize": false,
-            "largeChartUrl": ""
-        }
-    `
-    const container = element.querySelector('.tradingview-widget-container');
-    if (container) container.insertAdjacentElement('beforeend', widgetScript);
-}
-
-export async function createPrice(json) {
+export function createPrice(json) {
     if (typeof json !== 'object' && json.length) return false;
     const ln = json.length;
     for (let i=0; i<ln; i++) {
-        const price = await getPrice();
+        const price = 0;
         json[i].Price = price ? price : 0;
     }
-    return await json;
+    return json;
 }
 
 export function getUnicCoins(array, type) {
@@ -87,13 +63,13 @@ export function setLocalStorage(key, value) {
     localStorage.setItem(key, value);
 }
 
-// function IsJsonString(str) {
-//     try {
-//         return JSON.parse(str);
-//     } catch (e) {
-//         return str;
-//     }
-// }
+export function IsJsonString(str) {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return str;
+    }
+}
 
 export function separate(pair, separator = '/') {
     return pair.split(separator);
@@ -114,20 +90,13 @@ export function defaultSelect(selector) {
     }
 }
 
-// export function truncate(v, p) {
-//     var s = Math.pow(10, p || 0);
-//     return Math.trunc(s * v) / s;
-// }
-
 export function truncate(number, digits) {
-    var reg_ex = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)")
-    var array = number.toString().match(reg_ex);
-    return array ? parseFloat(array[1]) : number.valueOf()
+    const reg_ex = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)");
+    const array = number.toString().match(reg_ex);
+    return array ? parseFloat(array[1]) : number.valueOf();
 }
 
 export function euroDate(str) {
-    // const temp = str.split('.');
-    // return new Date(`${temp[1]}.${temp[0]}.${temp[2]}`);
     return new Date(str);
 }
 

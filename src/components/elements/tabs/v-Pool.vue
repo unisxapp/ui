@@ -120,16 +120,9 @@ export default {
         },
         onSelectClick: {
             type: Function
-        },
-        onTableClick: {
-            type: Function
         }
     },
-    // data() {
-    //     return {
-    //         selectedItem: this.DEX
-    //     }
-    // },
+
     computed: {
         ...mapGetters([
             'INSTRUMENTS', 'PORTFOLIO'
@@ -268,10 +261,8 @@ export default {
         toPrice(token) {
             switch (token) {
                 case 'firstToken':
-                    // return round((toDote(this.selectedItem.firstTokenAmount) * this.selectedItem.tokenPrice), 4).toString();
                     return (+this.selectedItem.firstTokenAmount * this.selectedItem.tokenPrice).toString();
                 case 'secondToken':
-                    // return round((toDote(this.selectedItem.secondTokenAmount) / this.selectedItem.tokenPrice), 4).toString();
                     return (+this.selectedItem.secondTokenAmount / this.selectedItem.tokenPrice).toString();
                 default:
                     return token;
@@ -289,10 +280,6 @@ export default {
             this.selectedItem.tokenCode = pair.tokenCode;
             this.selectedItem.firstToken = pair.firstToken;
             this.selectedItem.secondToken = pair.secondToken;
-            // this.selectedItem.firstTokenInWallet = (+selectedItemData.tokenBalanceFormatted).toFixed(toFix).toString();
-            // this.selectedItem.secondTokenInWallet = (+selectedItemData.USDCBalanceFormatted).toFixed(toFix).toString();
-            // this.selectedItem.firstTokenAmountInPool = (+selectedItemData.tokenAvailableToWithdrawFormatted).toFixed(toFix).toString();
-            // this.selectedItem.secondTokenAmountInPool = (+selectedItemData.USDCAvailableToWithdrawFormatted).toFixed(toFix).toString();
             this.selectedItem.firstTokenInWallet = selectedItemData.tokenBalanceFormatted;
             this.selectedItem.secondTokenInWallet = selectedItemData.USDCBalanceFormatted;
             this.selectedItem.firstTokenAmountInPool = selectedItemData.tokenAvailableToWithdrawFormatted;
@@ -319,9 +306,8 @@ export default {
     mounted() {
     },
     updated() {
-        const currentLabel = document.querySelector('#pool + .nice-select .current');
-                                
-        if (currentLabel) {                        
+        const currentLabel = document.querySelector('#pool + .nice-select .current');        
+        if (currentLabel && this.selectedItem.firstToken) {                        
             setTimeout(() => {
                 currentLabel.innerHTML = this.selectedItem.firstToken;
             },0);

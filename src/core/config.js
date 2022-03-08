@@ -12,7 +12,8 @@ export const CHAIN_CONFIG = {
   },
 }
 
-export const MINTER_REWARD_RATE = Number(100_000n) * (Number(10n) ** Number(18n)) / Number(365n) / Number(24n) / Number(3600n)
+// eslint-disable-next-line no-undef
+export const MINTER_REWARD_RATE = Number(100_000n) * (Number(10n) ** Number(18n)) / Number(365n) / Number(24n) / Number(3600n);
   // 100_000n * // 100_000 tokens to distribute per year
   // (10n ** 18n) // decimals
   // / 365n / 24n / 3600n // seconds per year
@@ -26,4 +27,3 @@ export const CORRECTION_FACTOR = '1.0'
 export const MINTER_REWARDS_PER_TOKEN_DAY = 1
 
 export const PRICE_PRECISION = 3 // 2 places from USD, 1 place from dividing by 10
-

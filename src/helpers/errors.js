@@ -31,9 +31,11 @@ export default function errorStatus(error = '', value = '', token = '') {
         case 'failed':
             return {isError: true, text: 'Transaction failed'};
         case 'success':
-            return {isError: false, text: 'success'};
+            return {isError: false, text: 'Success'};
         case 'mintCreate':
-            return {isError: false, text: `You are created ${value} uSPAC10 synths!`};         
+            return {isError: false, text: `You are created ${value} uSPAC10 synths!`};  
+        case 'faucet':
+            return {isError: false, text: `You are getting coins..`};         
         default:
             return '';
     }

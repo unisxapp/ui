@@ -6,7 +6,7 @@
                     <div class="footer_wrp">
                         <div class="row flex center">
                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                <a href="" class="logo"><img src="../assets/img/logo.png" alt=""><span>© 2021 Universal Synthetics</span></a>
+                                <a href="" class="logo"><img src="../assets/img/logo.png" alt=""><span>© 2022 Universal Synthetics</span></a>
                             </div>
                             <div class="col-md-8 col-sm-8 col-xs-12">
                                 <div class="foot_flex">

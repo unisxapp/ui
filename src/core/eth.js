@@ -11,7 +11,7 @@ import { ethers } from 'ethers'
 
 import {accountPromise} from './metamask.js'
 import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY} from './config.js'
-import {getPrice} from './price.js'
+import {getPrice, getHistoricalPrice} from './price.js'
 import {getRewards} from './minter_rewards.js'
 
 export const UNISWAP_DECIMALS = 18
@@ -42,10 +42,7 @@ let LPPairs
 
 let price
 
-export const ethPromise = Promise.all([
-  accountPromise,
-  getPrice().then(_price => price = ethers.FixedNumber.from(_price)),
-]).then(async () => {
+export const ethPromise = accountPromise.then(async () => {
     provider = new ethers.providers.Web3Provider(window.ethereum)
     signer = provider.getSigner()
 
@@ -58,7 +55,20 @@ export const ethPromise = Promise.all([
     UNISXStakingRewards = new ethers.Contract(getChainConfig().UNISXStakingRewards, UNISXStakingRewards_ABI, signer)
     LPStakingRewardsFactory = new ethers.Contract(getChainConfig().LPStakingRewardsFactory, LPStakingRewardsFactory_ABI, signer)
 
+    // Initialize price
+    const pricePromise = Promise.all([
+      financialContract.expirationTimestamp().then(ts => ts.toNumber()),
+      provider.getBlock('latest').then(block => block.timestamp),
+    ]).then(async ([expirationTimestamp, currentTimestamp]) => {
+      if(expirationTimestamp > currentTimestamp) {
+        price = ethers.FixedNumber.from(await getPrice())
+      } else {
+        price = ethers.FixedNumber.from(await getHistoricalPrice(expirationTimestamp))
+      }
+    })
+
     await Promise.all([
+
 
       (async () => {
         UNISXDecimals = await UNISXToken.decimals()
@@ -79,11 +89,12 @@ export const ethPromise = Promise.all([
       })(),
 
       (async () => {
-        const [totalTokensOutstanding, totalPositionCollateral] = await Promise.all([
+        const [totalTokensOutstanding, totalPositionCollateral, _] = await Promise.all([
           financialContract.totalTokensOutstanding(),
           financialContract.totalPositionCollateral().then(
             ({rawValue}) => rawValue
           ),
+          pricePromise,
         ])
         GCR = 
           ethers.FixedNumber.from(totalPositionCollateral.toString())
@@ -270,6 +281,10 @@ export async function getFinancialContractProperties(){
     priceIdentifier: ethers.utils.toUtf8String(
       (await financialContract.priceIdentifier()).slice(0, 32)
     ),
+
+    price,
+
+    priceFormatted: price.toString(),
 
     expirationState: getExpirationState(),
 	})

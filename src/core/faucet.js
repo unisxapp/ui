@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 import {fetchAPI} from './api.js'
 import {provider} from './eth.js'
 

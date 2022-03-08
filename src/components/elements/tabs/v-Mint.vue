@@ -14,8 +14,8 @@
                         ref="synt"
                     >
                     <div class="input-wrapp">
-                        <div class="flex-collumn" id="portfolioList" @click="onSelectClick($event)">
-                            <select id="portfolio">
+                        <div class="flex-collumn" id="mintList" @click="onSelectClick($event)">
+                            <select id="mint">
                                 <option value="" disabled selected>Instrument</option>
                                 <option 
                                     v-for="instrument in instrumentsList" 
