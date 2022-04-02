@@ -71,9 +71,6 @@
                     <button class="cancelbut disabled" @click="mint" ref="mintBtn" :disabled="!synthetic.tokensAmount">Mint</button>
                     <button class="blueb disabled" @click="burn" ref="burnBtn" :disabled="!synthetic.collateralAmount">Burn</button>
                 </div>
-                <div v-if="synthetic.isOracle" class="but_flex mt-auto lr-auto">
-                    <button class="blueb disabled" @click="setExpired">Settle Expired</button>
-                </div>
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12 flex-collumn">
                 <h4>COLLATERAL</h4>
@@ -128,6 +125,9 @@
                     <button class="cancelbut disabled" @click="deposit" :disabled="!(+selectedItem.Number > 0) || !synthetic.tokensAmount">Supply</button>
                     <button class="blueb disabled" @click="withdraw" :disabled="!(+selectedItem.Number > 0) || !synthetic.tokensAmount">Withdraw</button>
                 </div>
+            </div>
+            <div v-if="synthetic.isOracle" class="but_flex mt-20 lr-auto">
+                <button class="blueb disabled" @click="setExpired">Settle Expired</button>
             </div>
         </div>
     </div>

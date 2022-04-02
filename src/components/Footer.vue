@@ -25,8 +25,8 @@
                                         </li>
                                     </ul>
                                     <ul class="top_list">
-                                        <li><a href="https://welcome-3.gitbook.io/unisx-project/" target="_blank">ABOUT UNISX</a></li>
-                                        <li><a href=" https://welcome-3.gitbook.io/unisx-project/faq" target="_blank">FAQ</a></li>
+                                        <li><a href="https://welcome-3.gitbook.io/unisx-project/what-is-a-spac" target="_blank">ABOUT UNISX</a></li>
+                                        <li><a href="https://welcome-3.gitbook.io/unisx-project/what-is-a-spac" target="_blank">FAQ</a></li>
                                     </ul>
                                 </div>
                             </div>

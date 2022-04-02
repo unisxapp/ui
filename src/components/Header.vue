@@ -25,8 +25,8 @@
                                         <a :href="href" @click="navigate">operations</a>
                                     </li>
                                 </router-link>
-                                <li><a href="https://welcome-3.gitbook.io/unisx-project/faq" target="_blank">Doc</a></li>
-                                <li><a href="https://welcome-3.gitbook.io/unisx-project/" target="_blank">About</a></li>
+                                <li><a href="https://welcome-3.gitbook.io/unisx-project/what-is-a-spac" target="_blank">Doc</a></li>
+                                <li><a href="https://welcome-3.gitbook.io/unisx-project/what-is-a-spac" target="_blank">About</a></li>
                             </ul>
                         </div>
                         <div class="open_nav"> <img src="../assets/img/menu.svg" alt=""> </div>
