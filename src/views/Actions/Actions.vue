@@ -256,10 +256,12 @@ export default {
 
     async handleUpdateAfterAction() {
       await ethPromise;
-      await Promise.all(
-        [this.GET_POSITION(), this.GET_ACCOUNT(), this.GET_POOL_PROPERTIES(),
-        this.GET_FINANCIAL_CONTRACT_PROPERTIES()]
-      );
+      await Promise.all([
+        this.GET_POSITION(),
+        this.GET_ACCOUNT(),
+        this.GET_POOL_PROPERTIES(),
+        this.GET_FINANCIAL_CONTRACT_PROPERTIES(),
+      ]);
       await this.handleUpdatePortfolioList();
       this.handleUpdateChart();
       this.updateSelectedItemBalance(this.selectedItem);
@@ -271,14 +273,17 @@ export default {
       const collateralAmount = this.POSITION;
       const collateralBalance = this.ACCOUNT;
       const contractProperties = this.FINANCIAL_CONTRACT_PROPERTIES;
-      const uSPAC10_PRICE = +contractProperties.priceFormatted ? +contractProperties.priceFormatted : 0;
+      const uSPAC10_PRICE = +contractProperties.priceFormatted
+        ? +contractProperties.priceFormatted
+        : 0;
       const poolProperties = this.POOL_PROPERTIES;
       const collateralRatio =
         +collateralAmount.collateralAmountFormatted /
-        (+collateralAmount.tokensOutstandingFormatted *
-          uSPAC10_PRICE);
+        (+collateralAmount.tokensOutstandingFormatted * uSPAC10_PRICE);
 
-      const minterRewardFormatted = isNaN(this.minterReward) ? 0 : this.minterReward;
+      const minterRewardFormatted = isNaN(this.minterReward)
+        ? 0
+        : this.minterReward;
       const UNISXRewardEarned = collateralBalance.UNISXRewardEarnedFormatted;
       const UNISXRewardPaid = collateralBalance.UNISXRewardPaidFormatted;
       let stakingLPRewards = +UNISXRewardEarned + +UNISXRewardPaid;
@@ -305,7 +310,7 @@ export default {
       const denominator =
         (+minterRewardFormatted / ONE_DAY_VALUE / positionAgeDays) *
         1.5 *
-        uSPAC10_PRICE; 
+        uSPAC10_PRICE;
 
       if (syntValue && positionAgeDays) {
         apyMint =
@@ -322,16 +327,12 @@ export default {
 
       const priceAPY = apyMint + apyStake;
 
-      if (
-        item.Name &&
-        ["uSPAC5", "uSPAC10"].includes(item.Name)
-      ) {
+      if (item.Name && ["uSPAC5", "uSPAC10"].includes(item.Name)) {
         const value = item.Name;
         const selectedValue = this.INSTRUMENTS.find((i) => i.Name === value);
         const globalCollateralRatio =
           +contractProperties.totalPositionCollateralFormatted /
-          (+contractProperties.totalTokensOutstandingFormatted *
-            uSPAC10_PRICE);
+          (+contractProperties.totalTokensOutstandingFormatted * uSPAC10_PRICE);
 
         this.synthetic = {
           name: selectedValue.Name,
@@ -348,8 +349,9 @@ export default {
         };
 
         if (contractProperties.isExpired) {
-          console.error(errorStatus("mintExpired"));
-          this.synthetic.isOracle = contractProperties.isExpirationPriceReceived;
+          this.handleShowMessage(errorStatus("mintExpired"));
+          this.synthetic.isOracle =
+            contractProperties.isExpirationPriceReceived;
         }
       }
 
@@ -470,7 +472,9 @@ export default {
     portfolioList: function () {
       const portfolio = [];
 
-      const uSPAC10_PRICE = this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted ? this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted : 0;
+      const uSPAC10_PRICE = this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted
+        ? this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted
+        : 0;
 
       const instumentsJSON = this.INSTRUMENTS.map((instrument) => {
         return {

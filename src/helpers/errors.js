@@ -15,7 +15,7 @@ export default function errorStatus(error = '', value = '', token = '') {
         case 'collateralAvailableForFastWithdrawal':
             return {isError: true, text: 'Too many collateral tokens to fast withdraw'};            
         case 'mintExpired':
-            return {isError: true, text: 'Contract expired'};
+            return {isError: true, text: 'Contract in expiration. Waiting expiration price.'};
         case 'poolTokensCount':
             return {isError: true, text: `The number of ${token} tokens exceeds the available ones in the wallet. Available ${value} ${token}`};
         case 'unPoolTokensCount':
