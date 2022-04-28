@@ -7,7 +7,7 @@ import UNISXStakingRewards_ABI from './abi/UNISXStakingRewards.js'
 import LPStakingRewards_ABI from './abi/LPStakingRewards.js'
 import LPStakingRewardsFactory_ABI from './abi/LPStakingRewardsFactory.js'
 import ERC20 from './abi/ERC20_ABI.js'
-import { ethers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 
 import {accountPromise} from './metamask.js'
 import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY} from './config.js'
@@ -90,13 +90,15 @@ export const ethPromise = accountPromise.then(async () => {
       })(),
 
       (async () => {
-        const [totalTokensOutstanding, totalPositionCollateral, _] = await Promise.all([
+        let [totalTokensOutstanding, totalPositionCollateral, _] = await Promise.all([
           financialContract.totalTokensOutstanding(),
           financialContract.totalPositionCollateral().then(
             ({rawValue}) => rawValue
           ),
           pricePromise,
         ])
+        if (Number(totalTokensOutstanding) === 0)
+         totalTokensOutstanding = 1
         GCR = 
           ethers.FixedNumber.from(totalPositionCollateral.toString())
           .divUnsafe(
@@ -134,7 +136,9 @@ export const ethPromise = accountPromise.then(async () => {
               LPStakingRewards_ABI, 
               signer
             )
-            return [tokenCode, {token, pair, stakingRewards}]
+            if (pairAddress !== '0x0000000000000000000000000000000000000000')
+              return [tokenCode, {token, pair, stakingRewards}]
+            else return [tokenCode, {token, pair: {}, stakingRewards: {}}]
           })
         ))
       }),
@@ -631,8 +635,12 @@ export async function getPoolProperties(account = window.ethereum.selectedAddres
   return promisedProperties(
     Object.fromEntries(
       Object.entries(LPPairs)
-        .map(([key, {token, pair, stakingRewards}]) => 
-          [key, getPairProperties(account, token, pair, stakingRewards)])
+        .map(([key, {token, pair, stakingRewards}]) =>{
+          if ((pair instanceof Contract) && (stakingRewards.address !== '0x0000000000000000000000000000000000000000'))
+            return [key, getPairProperties(account, token, pair, stakingRewards)]
+          else 
+            return [key, {}]
+        })
     )
   )
 }

@@ -190,8 +190,23 @@
           </button>
         </div>
       </div>
-      <div v-if="synthetic.isExpired" class="but_flex mt-20 lr-auto">
+      <div
+        v-if="
+          synthetic.isExpired &&
+          (+this.synthetic.syntheticIntheWallet !== 0 ||
+            +this.selectedItemBalance.collateralTokens !== 0)
+        "
+        class="but_flex mt-20 lr-auto"
+      >
         <button
+          v-if="synthetic.isOracle === undefined"
+          class="blueb disabled"
+          @click="expire"
+        >
+          Expire
+        </button>
+        <button
+          v-else
           class="blueb disabled"
           @click="setExpired"
           :disabled="!synthetic.isOracle"
@@ -213,6 +228,7 @@ import {
   collateralByTokenCurrency,
   createPosition,
   deposit,
+  financialContract,
   redeem,
   settleExpired,
   tokenCurrencyByCollateral,
@@ -303,6 +319,7 @@ export default {
           this.onMessage(errorStatus("mintTokensCount", syntheticInWallet));
           console.error(errorStatus("mintTokensCount"));
         } else if (+tokensAmount < +minSponsorTokens) {
+          console.log(tokensAmount, minSponsorTokens);
           this.onMessage(errorStatus("mintSponsorTokens", minSponsorTokens));
           console.error(errorStatus("mintSponsorTokens", minSponsorTokens));
         } else {
@@ -462,6 +479,19 @@ export default {
         return;
       }
       console.log("settleExpired success!");
+    },
+
+    async expire() {
+      try {
+        this.onMessage(errorStatus("proccess"));
+        await financialContract.expire();
+        this.onMessage(errorStatus("success"));
+        this.onAfterClickAction();
+      } catch (e) {
+        this.onMessage(errorStatus("failed"));
+        console.error(e);
+        return;
+      }
     },
 
     async handleMaxClick(token) {

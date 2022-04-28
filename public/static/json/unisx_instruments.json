@@ -11,7 +11,7 @@
 		"CR": "1.5",
 		"DEX":
 		[
-			{"Pair": "Sushiswap uSPAC10-test/USDC", "PoolAddress": "0xd339daba500e0628ba3f348babf972925a37ea3d"},
+			{"Pair": "Sushiswap uSPAC10/USDC", "PoolAddress": "0x01E5DD7A0584E2EeD289399AdF4dc3786080b3be"},
 			{"Pair": "Sushiswap UNISX/USDC", "PoolAddress": "0x01e7fd992899b6aed1eabad46db51c08c64ace3e"}
 		],
 		"Rewards": "20",

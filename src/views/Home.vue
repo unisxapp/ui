@@ -8,8 +8,14 @@
               <div class="row">
                   <div class="col-md-12">
                       <div class="ovh">
-                          <h1 data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">UniSX decentralised <br>indexes
+                          <h1 data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">UniSX decentralised
                           </h1>
+                            <div class="d-flex-start">
+                            <h1 data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">indexes</h1>
+                            <router-link :to="{ name: 'Actions'}" custom v-slot="{ navigate, href }">
+                                <a :href="href" @click="navigate" data-aos="fade" data-aos-delay="1200" data-aos-duration="800" class="orangebut d-flex">LAUNCH</a>
+                            </router-link>
+                          </div>
                       </div>
                       <div class="after_h1_wrp">
                           <div class="ovh">
@@ -17,9 +23,6 @@
                                 New synthetic assets tied to the classical stock market - stocks, thematic ETFs, and SPAC indexes. Synthetic assets provide investors with greater access to prospective investments of the future and liquidity. Synthetics are created by depositing collateral into a smart contract and minting tokens backed by that collateral.
                             </p>
                           </div>
-                            <router-link :to="{ name: 'Actions'}">
-                                <a href="" data-aos="fade" data-aos-delay="1200" data-aos-duration="800" class="orangebut d-flex">OPERATIONS</a>
-                            </router-link>
                       </div>
                   </div>
               </div>
@@ -83,5 +86,21 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    .d-flex-start {
+        display: flex;
+        align-items: center;
+    }
+    .ovh h1 {
+        margin-bottom: 0;
+    }
+    h1 {
+        margin-right: 25px;
+    }
+    .after_h1_wrp {
+        margin-top: 20px;
+    }
+    .orangebut {
+        max-width: 212px;
     }
 </style>

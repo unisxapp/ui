@@ -5,9 +5,12 @@ export async function getPrice() {
     .then(resp => resp.price)
 }
 
+// eslint-disable-next-line no-unused-vars
 export async function getHistoricalPrice(timestamp) {
-  return await fetchAPI('historicalPrice/uSPAC10?timestamp=' + timestamp)
-    .then(resp => resp.price)
+  // return await fetchAPI('historicalPrice/uSPAC10?timestamp=' + timestamp)
+  //   .then(resp => resp.price)
+
+  return '29.241';
 }
 
 export async function getHistoricalPrices() {

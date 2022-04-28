@@ -133,7 +133,7 @@ import { toFix, separate, defaultSelect } from "../../helpers";
 import errorStatus from "../../helpers/errors";
 import { mapActions, mapGetters } from "vuex";
 
-import { ethPromise } from "../../core/eth";
+import { financialContract, ethPromise } from "../../core/eth";
 
 import vAccount from "../../components/elements/v-account.vue";
 import vTable from "../../components/elements/v-table.vue";
@@ -269,7 +269,7 @@ export default {
       await this.$refs.dex.updateSelectedItem(this.selectedItem.Name);
     },
 
-    updateSelectedItemBalance(item = {}) {
+    async updateSelectedItemBalance(item = {}) {
       const collateralAmount = this.POSITION;
       const collateralBalance = this.ACCOUNT;
       const contractProperties = this.FINANCIAL_CONTRACT_PROPERTIES;
@@ -342,16 +342,44 @@ export default {
           totalSyntTokensOutstanding:
             contractProperties.totalTokensOutstandingFormatted,
           totalCollateral: contractProperties.totalPositionCollateralFormatted,
-          globalCollateralizationRation: globalCollateralRatio,
+          globalCollateralizationRation: globalCollateralRatio
+            ? globalCollateralRatio
+            : 0,
           syntheticIntheWallet: collateralBalance.tokenCurrencyBalanceFormatted,
           minSponsorTokens: contractProperties.minSponsorTokensFormatted,
           isExpired: contractProperties.isExpired,
         };
 
         if (contractProperties.isExpired) {
-          this.handleShowMessage(errorStatus("mintExpired"));
-          this.synthetic.isOracle =
-            contractProperties.isExpirationPriceReceived;
+          this.handleShowMessage(errorStatus("mintExpiredNoSynth"));
+          const contractState = await financialContract.contractState();
+          let T = "";
+
+          if (
+            +this.synthetic.syntheticIntheWallet > 0 ||
+            +collateralAmount.collateralAmountFormatted > 0
+          ) {
+            switch (contractState) {
+              case 0:
+                this.handleShowMessage(errorStatus("setExpire"));
+                break;
+              case 1:
+                T = await financialContract
+                  .expirationTimestamp()
+                  .then((ts) => ts.toNumber());
+                T = new Date(T + 7200);
+                this.handleShowMessage(
+                  errorStatus("mintExpired", T.toLocaleString())
+                );
+                this.synthetic.isOracle = false;
+                break;
+              case 2:
+                this.handleShowMessage(errorStatus("setExpired"));
+                this.synthetic.isOracle =
+                  contractProperties.isExpirationPriceReceived;
+                break;
+            }
+          }
         }
       }
 
@@ -571,6 +599,7 @@ export default {
       }
 
       const poolProperties = this.POOL_PROPERTIES;
+
       for (let i of poolInstruments[0]) {
         if (
           i.token.indexOf("Sushiswap UNISX") !== -1 ||
@@ -581,11 +610,25 @@ export default {
               ? separate(separate(i.token)[0], " ")[1]
               : "uSPAC10";
 
+          console.log(key, poolProperties[key]);
+
+          const rewardEarnedFormatted = poolProperties[key]
+            .rewardEarnedFormatted
+            ? +poolProperties[key].rewardEarnedFormatted
+            : 0;
+          const stakedFormatted = poolProperties[key].stakedFormatted
+            ? +poolProperties[key].stakedFormatted
+            : 0;
+
           portfolio.push({
             Name: i.token,
             Status: "-",
-            Price: (+poolProperties[key].price).toFixed(toFix) ?? 0,
-            Number: poolProperties[key].liquidityFormatted,
+            Price: poolProperties[key].price
+              ? (+poolProperties[key].price).toFixed(toFix) ?? 0
+              : 0,
+            Number: poolProperties[key].liquidityFormatted
+              ? poolProperties[key].liquidityFormatted
+              : 0,
             Value: "",
             GT: 0,
             UMA: 0,
@@ -593,9 +636,9 @@ export default {
             CollateralName: "",
             Description: "",
             CR: "",
-            Rewards: `${(+poolProperties[key].rewardEarnedFormatted)
+            Rewards: `${rewardEarnedFormatted
               .toFixed(toFix)
-              .toString()} (To Claim) / ${(+poolProperties[key].stakedFormatted)
+              .toString()} (To Claim) / ${stakedFormatted
               .toFixed(toFix)
               .toString()} (In the Stake)`,
           });
