@@ -203,9 +203,7 @@ export default {
         this.updateStakeProfile();
         this.updateSelectedItemBalance(item);
       } else if (
-        ["Sushiswap uSPAC10-test/USDC", "Sushiswap UNISX/USDC"].includes(
-          item?.Name
-        )
+        ["Sushiswap uSPAC10/USDC", "Sushiswap UNISX/USDC"].includes(item?.Name)
       ) {
         this.selectedItem = item;
         this.updateStakeProfile(item);
@@ -419,12 +417,12 @@ export default {
         this.stakeProfile.unisxRewardEarned =
           collateralBalance.UNISXRewardEarnedFormatted;
       } else if (
-        ["Sushiswap uSPAC10-test/USDC", "Sushiswap UNISX/USDC"].includes(
+        ["Sushiswap uSPAC10/USDC", "Sushiswap UNISX/USDC"].includes(
           this.stakeProfile.name
         )
       ) {
         const key =
-          separate(this.stakeProfile.name)[0] === "Sushiswap uSPAC10-test"
+          separate(this.stakeProfile.name)[0] === "Sushiswap uSPAC10"
             ? "uSPAC10"
             : separate(separate(this.stakeProfile.name)[0], " ")[1];
         this.stakeProfile.unisxAmount = "";
@@ -609,8 +607,6 @@ export default {
             separate(i.token)[0] !== "Sushiswap uSPAC10-test"
               ? separate(separate(i.token)[0], " ")[1]
               : "uSPAC10";
-
-          console.log(key, poolProperties[key]);
 
           const rewardEarnedFormatted = poolProperties[key]
             .rewardEarnedFormatted

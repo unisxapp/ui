@@ -52,6 +52,7 @@ export function ensureMetamask(){
   if(!window.ethereum){
     throw new MetamaskError('Please install and enable Metamask')
   }
+  
   if(!(parseInt(window.ethereum.chainId) in CHAIN_CONFIG)){
     throw new MetamaskError('Unsupported network')
   }

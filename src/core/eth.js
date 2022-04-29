@@ -136,7 +136,7 @@ export const ethPromise = accountPromise.then(async () => {
               LPStakingRewards_ABI, 
               signer
             )
-            if (pairAddress !== '0x0000000000000000000000000000000000000000')
+            if (!ethers.BigNumber.from(pairAddress).isZero())
               return [tokenCode, {token, pair, stakingRewards}]
             else return [tokenCode, {token, pair: {}, stakingRewards: {}}]
           })
@@ -568,9 +568,9 @@ async function getPairProperties(account, token, pair, stakingRewards) {
     pair.totalSupply(),
     token.balanceOf(account),
     USDC.balanceOf(account),
-    stakingRewards._balances(account),
-    stakingRewards.callStatic.getReward({from: account}),
-    getRewardPaid(account, stakingRewards),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards._balances(account),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : getRewardPaid(account, stakingRewards),
   ])
 
   const [reserveUSDC, reserveToken] = token0 == USDC.address
@@ -636,10 +636,7 @@ export async function getPoolProperties(account = window.ethereum.selectedAddres
     Object.fromEntries(
       Object.entries(LPPairs)
         .map(([key, {token, pair, stakingRewards}]) =>{
-          if ((pair instanceof Contract) && (stakingRewards.address !== '0x0000000000000000000000000000000000000000'))
             return [key, getPairProperties(account, token, pair, stakingRewards)]
-          else 
-            return [key, {}]
         })
     )
   )
