@@ -4,11 +4,11 @@ export const CHAIN_CONFIG = {
     financialContractAddress: "0x89477Dd602f69c59Eb6B8e5C059F041a32ae4017",
     UNISXToken: "0xDD641511cE248fF136095aa49A02FeF18CBbfc2A",
     xUNISXToken: "0x620E2898bd7bb7910Ef7b5B03A256F5c2DEe2Ccd",
-    LPStakingRewardsFactory: "",
-    UNISXStakingRewards: "",
-    SushiV2Router02: "",
+    LPStakingRewardsFactory: "0xea337f6d78eD90d8488c18b641dbDA1d5675Ef40",
+    UNISXStakingRewards: "0x84b55204DD018Df703765A1005Dd3A5223aFFFcb",
+    SushiV2Router02: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
     USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    rewardPayer: "", // address of multisender contract
+    rewardPayer: "0xA5025FABA6E70B84F74e9b1113e5F7F4E7f4859f", // address of multisender contract
   },
   // Kovan
   42: {

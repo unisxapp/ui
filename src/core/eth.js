@@ -636,7 +636,10 @@ export async function getPoolProperties(account = window.ethereum.selectedAddres
     Object.fromEntries(
       Object.entries(LPPairs)
         .map(([key, {token, pair, stakingRewards}]) =>{
-            return [key, getPairProperties(account, token, pair, stakingRewards)]
+            if ((pair instanceof Contract))
+              return [key, getPairProperties(account, token, pair, stakingRewards)]
+            else
+              return[key,{}]
         })
     )
   )
