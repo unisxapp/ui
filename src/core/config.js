@@ -1,4 +1,17 @@
 export const CHAIN_CONFIG = {
+  // Ethereum
+  1: {
+    // financialContractAddress: '0x204A60b2d31e4795fbF031837D5dD210eb44263a',
+    financialContractAddress: sessionStorage.financialContractAddress 
+    ?? '0x89477Dd602f69c59Eb6B8e5C059F041a32ae4017',
+    UNISXToken: "",
+    xUNISXToken: "",
+    LPStakingRewardsFactory: "",
+    UNISXStakingRewards: "",
+    SushiV2Router02: "",
+    USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    rewardPayer: '', // address of multisender contract
+  }
   // Kovan
   42: {
     // financialContractAddress: '0x204A60b2d31e4795fbF031837D5dD210eb44263a',
