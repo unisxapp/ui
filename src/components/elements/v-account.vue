@@ -1,8 +1,19 @@
 <template>
   <div class="h2_flex">
-    <button v-if="isShowFaucet" @click="faucetClickHandle" class="orangebut">
+    <button
+      v-if="isShowFaucet"
+      @click="faucetClickHandle"
+      class="orangebut hidden"
+    >
       Faucet
     </button>
+    <a
+      href="https://snapshot.org/#/unisx.eth"
+      class="orangebut orangebut_link"
+      target="_blank"
+    >
+      VOTING
+    </a>
     <div class="account-id">
       <p v-if="NETWORK_ID">{{ NETWORK_ID }}:</p>
       <p v-if="USER_ACCOUNT">{{ USER_ACCOUNT }}</p>
@@ -48,10 +59,12 @@ export default {
           this.GET_isCONNECTED(true);
           this.GET_USER_ACCOUNT(account);
         });
-        await Promise.all(
-          [this.GET_POSITION(), this.GET_ACCOUNT(), this.GET_POOL_PROPERTIES(),
-          this.GET_FINANCIAL_CONTRACT_PROPERTIES()]
-        );
+        await Promise.all([
+          this.GET_POSITION(),
+          this.GET_ACCOUNT(),
+          this.GET_POOL_PROPERTIES(),
+          this.GET_FINANCIAL_CONTRACT_PROPERTIES(),
+        ]);
         this.onClickConnect();
       } catch (e) {
         this.GET_isCONNECTED(false);
@@ -61,16 +74,18 @@ export default {
     },
     async faucetClickHandle() {
       try {
-        this.onMessage(errorStatus('faucet'));  
+        this.onMessage(errorStatus("faucet"));
         await faucet();
-        await Promise.all(
-          [this.GET_POSITION(), this.GET_ACCOUNT(), this.GET_POOL_PROPERTIES(),
-          this.GET_FINANCIAL_CONTRACT_PROPERTIES()]
-        );
+        await Promise.all([
+          this.GET_POSITION(),
+          this.GET_ACCOUNT(),
+          this.GET_POOL_PROPERTIES(),
+          this.GET_FINANCIAL_CONTRACT_PROPERTIES(),
+        ]);
         this.onClickConnect();
-        this.onMessage(errorStatus('success')); 
+        this.onMessage(errorStatus("success"));
       } catch (e) {
-        this.onMessage(errorStatus('failed'));
+        this.onMessage(errorStatus("failed"));
         console.error(errorStatus("failed"));
       }
     },
@@ -108,5 +123,10 @@ export default {
 }
 .disconnect {
   height: 40px;
+}
+.orangebut_link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
