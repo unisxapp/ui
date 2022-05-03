@@ -8,6 +8,7 @@
       Faucet
     </button>
     <a
+      v-if="isShowVoiting"
       href="https://snapshot.org/#/unisx.eth"
       class="orangebut orangebut_link"
       target="_blank"
@@ -102,6 +103,9 @@ export default {
     ]),
     isShowFaucet: function () {
       return this.isCONNECTED && isFaucetAvailable();
+    },
+    isShowVoiting: function () {
+      return this.isCONNECTED;
     },
   },
   created() {
