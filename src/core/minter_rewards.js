@@ -52,10 +52,10 @@ async function _contractCreationBlock(address, low, high){
   }
 }
 
-const contractCreationBlock = cached('creationBlock', 1, 'int', _contractCreationBlock)
+export const contractCreationBlock = cached('creationBlock', 1, 'int', _contractCreationBlock)
 
 // returns latest block which timestamp is less or equal to given timestamp
-const blockByTimestamp = cached('blockByTimestamp', 1, 'int', async function blockByTimestamp(timestamp, from, to){
+export const blockByTimestamp = cached('blockByTimestamp', 1, 'int', async function blockByTimestamp(timestamp, from, to){
   async function blockByTimestampBinarySearch(from, to){
     // invariant: from.timestamp <= timestamp < to.timestamp
     if(from >= to){

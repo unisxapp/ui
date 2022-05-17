@@ -7,12 +7,12 @@ import UNISXStakingRewards_ABI from './abi/UNISXStakingRewards.js'
 import LPStakingRewards_ABI from './abi/LPStakingRewards.js'
 import LPStakingRewardsFactory_ABI from './abi/LPStakingRewardsFactory.js'
 import ERC20 from './abi/ERC20_ABI.js'
-import { Contract, ethers } from 'ethers'
+import { ethers } from 'ethers'
 
 import {accountPromise} from './metamask.js'
 import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY} from './config.js'
 import {getPrice, getHistoricalPrice} from './price.js'
-import {getRewards} from './minter_rewards.js'
+import {getRewards, contractCreationBlock, blockByTimestamp} from './minter_rewards.js'
 
 export const UNISWAP_DECIMALS = 18
 
@@ -60,8 +60,7 @@ export const ethPromise = accountPromise.then(async () => {
       financialContract.expirationTimestamp().then(ts => ts.toNumber()),
       provider.getBlock('latest').then(block => block.timestamp),
     ]).then(async ([expirationTimestamp, currentTimestamp]) => {
-      // if(expirationTimestamp > currentTimestamp) {
-        if((expirationTimestamp > currentTimestamp) || sessionStorage.forceCurrentPrice) {
+      if((expirationTimestamp > currentTimestamp) || sessionStorage.forceCurrentPrice) {
         price = ethers.FixedNumber.from(await getPrice())
       } else {
         price = ethers.FixedNumber.from(await getHistoricalPrice(expirationTimestamp))
@@ -90,15 +89,13 @@ export const ethPromise = accountPromise.then(async () => {
       })(),
 
       (async () => {
-        let [totalTokensOutstanding, totalPositionCollateral, _] = await Promise.all([
+        const [totalTokensOutstanding, totalPositionCollateral, _] = await Promise.all([
           financialContract.totalTokensOutstanding(),
           financialContract.totalPositionCollateral().then(
             ({rawValue}) => rawValue
           ),
           pricePromise,
         ])
-        if (Number(totalTokensOutstanding) === 0)
-         totalTokensOutstanding = 1
         GCR = 
           ethers.FixedNumber.from(totalPositionCollateral.toString())
           .divUnsafe(
@@ -305,6 +302,37 @@ export async function getFinancialContractProperties(){
   }
 }
 
+export async function getStakingProperties() {
+  const SECS_PER_YEAR = 365 * 24 * 3600
+  const toYearly = val => val.mul(SECS_PER_YEAR)
+
+  const LP = promisedProperties(
+    Object.fromEntries(
+      Object.entries(LPPairs).map(([tokenCode, {stakingRewards}]) => {
+        return [
+          tokenCode, 
+          stakingRewards
+            .rewardRate()
+            .then(toYearly)
+            .then(val => formatUnits(val, UNISXDecimals))
+        ]
+      })
+    )
+  )
+
+  const props = await promisedProperties({
+    LP,
+    UNISXStakingRewardYearlyBudget: UNISXStakingRewards.rewardRate().then(toYearly)
+  })
+  
+  return {...props,
+    UNISXStakingRewardYearlyBudgetFormatted: formatUnits(
+      props.UNISXStakingRewardYearlyBudget,
+      UNISXDecimals,
+    )
+  }
+}
+
 export async function getFundingRateAppliedTokenDebt(rawDebt){
   const {rawValue} = await financialContract.getFundingRateAppliedTokenDebt({rawValue: rawDebt})
   return rawValue
@@ -322,10 +350,32 @@ async function getPositionCreationTime(address) {
 }
 
 async function getMinterRewardPaid(address) {
-  const events = await UNISXToken.queryFilter(
-    UNISXToken.filters.Transfer(getChainConfig().rewardPayer, address)
+  const latest = await provider.getBlockNumber()
+  const [expirationTimestamp, creationBlock] = await Promise.all([
+    financialContract.expirationTimestamp().then(ts => ts.toNumber()),
+    contractCreationBlock(
+      getChainConfig().financialContractAddress, 
+      0,
+      latest
+    ),
+  ])
+  const creationBlockTimestamp = (await provider.getBlock(creationBlock)).timestamp
+  const [startTime, endTime] = [creationBlockTimestamp, expirationTimestamp]
+    .map(ts => ts + 3600 * 24 * 7 /* one week */)
+  const [startBlock, endBlock] = await Promise.all(
+    [startTime, endTime].map(ts => blockByTimestamp(ts, 0, latest))
   )
-  return events.reduce((total, e) => total.add(e.args.amount), ethers.BigNumber.from(0))
+  // Only select events that are one week later from contract deployment and
+  // one week later after expiration
+  const events = await UNISXToken.queryFilter(
+    UNISXToken.filters.Transfer(getChainConfig().rewardPayer, address),
+    startBlock,
+    endBlock,
+  )
+  return events.reduce(
+    (total, e) => total.add(e.args.amount), 
+    ethers.BigNumber.from(0)
+  )
 }
 
 export async function getPosition(address = window.ethereum.selectedAddress){
@@ -559,19 +609,21 @@ async function getPairProperties(account, token, pair, stakingRewards) {
     rewardEarned,
     rewardPaid,
   ] = await Promise.all([
-    pair.token0(),
-    pair.token1(),
-    pair.getReserves(),
+    !pair.address ? ethers.BigNumber.from(0) : pair.token0(),
+    !pair.address ? ethers.BigNumber.from(0) : pair.token1(),
+    !pair.address ? [ethers.BigNumber.from(0),ethers.BigNumber.from(0)] : pair.getReserves(),
     token.decimals(),
-    pair.balanceOf(account),
-    pair.decimals(),
-    pair.totalSupply(),
+    !pair.address ? ethers.BigNumber.from(0) : pair.balanceOf(account),
+    !pair.address ? 18 : pair.decimals(),
+    !pair.address ? ethers.BigNumber.from(0) : pair.totalSupply(),
     token.balanceOf(account),
     USDC.balanceOf(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards._balances(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : getRewardPaid(account, stakingRewards),
   ])
+
+  
 
   const [reserveUSDC, reserveToken] = token0 == USDC.address
   ? [reserves[0], reserves[1]]
@@ -635,12 +687,8 @@ export async function getPoolProperties(account = window.ethereum.selectedAddres
   return promisedProperties(
     Object.fromEntries(
       Object.entries(LPPairs)
-        .map(([key, {token, pair, stakingRewards}]) =>{
-            if ((pair instanceof Contract))
-              return [key, getPairProperties(account, token, pair, stakingRewards)]
-            else
-              return[key,{}]
-        })
+        .map(([key, {token, pair, stakingRewards}]) => 
+          [key, getPairProperties(account, token, pair, stakingRewards)])
     )
   )
 }
