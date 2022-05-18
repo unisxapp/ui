@@ -135,11 +135,12 @@ export const ethPromise = accountPromise.then(async () => {
             )
             if (!ethers.BigNumber.from(pairAddress).isZero())
               return [tokenCode, {token, pair, stakingRewards}]
-            else return [tokenCode, {token, pair: {}, stakingRewards: {}}]
+            else return [tokenCode, {token, pair: {}, stakingRewards}]
           })
         ))
       }),
     ])
+
   })
 
 export async function getBalance(account = window.ethereum.selectedAddress){
@@ -351,6 +352,7 @@ async function getPositionCreationTime(address) {
 
 async function getMinterRewardPaid(address) {
   const latest = await provider.getBlockNumber()
+
   const [expirationTimestamp, creationBlock] = await Promise.all([
     financialContract.expirationTimestamp().then(ts => ts.toNumber()),
     contractCreationBlock(
@@ -359,6 +361,7 @@ async function getMinterRewardPaid(address) {
       latest
     ),
   ])
+
   const creationBlockTimestamp = (await provider.getBlock(creationBlock)).timestamp
   const [startTime, endTime] = [creationBlockTimestamp, expirationTimestamp]
     .map(ts => ts + 3600 * 24 * 7 /* one week */)
@@ -611,19 +614,17 @@ async function getPairProperties(account, token, pair, stakingRewards) {
   ] = await Promise.all([
     !pair.address ? ethers.BigNumber.from(0) : pair.token0(),
     !pair.address ? ethers.BigNumber.from(0) : pair.token1(),
-    !pair.address ? [ethers.BigNumber.from(0),ethers.BigNumber.from(0)] : pair.getReserves(),
+    !pair.address ? [ethers.BigNumber.from(1),ethers.BigNumber.from(1)] : pair.getReserves(),
     token.decimals(),
     !pair.address ? ethers.BigNumber.from(0) : pair.balanceOf(account),
     !pair.address ? 18 : pair.decimals(),
-    !pair.address ? ethers.BigNumber.from(0) : pair.totalSupply(),
+    !pair.address ? ethers.BigNumber.from(1) : pair.totalSupply(),
     token.balanceOf(account),
     USDC.balanceOf(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards._balances(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : getRewardPaid(account, stakingRewards),
   ])
-
-  
 
   const [reserveUSDC, reserveToken] = token0 == USDC.address
   ? [reserves[0], reserves[1]]

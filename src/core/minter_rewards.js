@@ -44,12 +44,14 @@ async function _contractCreationBlock(address, low, high){
     return low
   }
   const middle = Math.floor((low + high) / 2)
+  
   const code = await provider.getCode(address, middle)
+
   if(code == '0x'){
     return _contractCreationBlock(address, middle + 1, high)
   } else {
     return _contractCreationBlock(address, low, middle)
-  }
+  } 
 }
 
 export const contractCreationBlock = cached('creationBlock', 1, 'int', _contractCreationBlock)
