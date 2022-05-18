@@ -613,7 +613,7 @@ export default {
             ? +poolProperties[key].rewardEarnedFormatted
             : 0;
           const stakedFormatted = poolProperties[key].stakedFormatted
-            ? +poolProperties[key].stakedFormatted
+            ? poolProperties[key].stakedFormatted
             : 0;
 
           portfolio.push({
@@ -634,9 +634,7 @@ export default {
             CR: "",
             Rewards: `${rewardEarnedFormatted
               .toFixed(toFix)
-              .toString()} (To Claim) / ${stakedFormatted
-              .toFixed(toFix)
-              .toString()} (In the Stake)`,
+              .toString()} (To Claim) / ${stakedFormatted} (In the Stake)`,
           });
         }
       }
