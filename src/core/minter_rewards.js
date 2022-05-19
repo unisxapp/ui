@@ -2,14 +2,19 @@
 /* eslint-disable no-unreachable */
 /* eslint-disable no-unused-vars */
 import { ethers } from 'ethers'
+import {accountPromise} from './metamask.js'
 import {createFinancialContract, getChainConfig, UNISXToken, UNISXDecimals, tokenCurrencyDecimals} from './eth.js'
 import {MINTER_REWARD_RATE} from './config.js'
 
 const BN = ethers.BigNumber.from
 
 
-const provider = new ethers.providers.JsonRpcProvider(getChainConfig().archiveNodeURL)
-const financialContract = createFinancialContract(provider)
+let provider, financialContract
+
+accountPromise.then(() => {
+  provider = new ethers.providers.JsonRpcProvider(getChainConfig().archiveNodeURL)
+  financialContract = createFinancialContract(provider)
+})
 
 // For debug
 function nocached(key, argCount, resultType, fn) {
