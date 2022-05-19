@@ -9,12 +9,13 @@ export const CHAIN_CONFIG = {
     SushiV2Router02: "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
     USDC: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     rewardPayer: "0xA5025FABA6E70B84F74e9b1113e5F7F4E7f4859f", // address of multisender contract
+    archiveNodeURL: 'https://eth-mainnet.alchemyapi.io/v2/gfZGRocGit3Mb2zWPeVt9iE-7HoTAsGu',
   },
   // Kovan
   42: {
     // financialContractAddress: '0x204A60b2d31e4795fbF031837D5dD210eb44263a',
     financialContractAddress: sessionStorage.financialContractAddress 
-    ?? '0x94318ff5b4e86efac5e3fbee684688c91924d29a',
+      ?? '0x94318ff5b4e86efac5e3fbee684688c91924d29a',
     UNISXToken: "0x0fd2dD751D4803EbE981CD39d8dcB0dB656F8D44",
     xUNISXToken: "0x29DEAB859E99A32083FEeeE870e6e3eb6403e21c",
     LPStakingRewardsFactory: "0xD99E5262090274468D6A9d91a290d35BC07aA4fD",
@@ -22,6 +23,7 @@ export const CHAIN_CONFIG = {
     SushiV2Router02: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
     USDC: '0xe22da380ee6B445bb8273C81944ADEB6E8450422',
     rewardPayer: '0xa5025faba6e70b84f74e9b1113e5f7f4e7f4859f', // address of multisender contract
+    archiveNodeURL: 'https://eth-kovan.alchemyapi.io/v2/gfZGRocGit3Mb2zWPeVt9iE-7HoTAsGu',
   },
 }
 

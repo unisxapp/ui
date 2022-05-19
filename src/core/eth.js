@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import EMP_ABI from './abi/EMP_ABI.js'
 import UniswapV2Router02_ABI from './abi/UniswapV2Router02.js'
@@ -7,9 +8,9 @@ import UNISXStakingRewards_ABI from './abi/UNISXStakingRewards.js'
 import LPStakingRewards_ABI from './abi/LPStakingRewards.js'
 import LPStakingRewardsFactory_ABI from './abi/LPStakingRewardsFactory.js'
 import ERC20 from './abi/ERC20_ABI.js'
-import { ethers } from 'ethers'
 
 import {accountPromise} from './metamask.js'
+import { ethers } from 'ethers'
 import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY} from './config.js'
 import {getPrice, getHistoricalPrice} from './price.js'
 import {getRewards, contractCreationBlock, blockByTimestamp} from './minter_rewards.js'
@@ -22,7 +23,7 @@ function FN_to_BN(value) {
   return ethers.BigNumber.from(value.toString().split('.')[0])
 }
 
-function getChainConfig(){
+export function getChainConfig(){
   return CHAIN_CONFIG[Number(window.ethereum.chainId)]
 }
 
@@ -42,6 +43,10 @@ let LPPairs
 
 let price
 
+export function createFinancialContract(provider) {
+  return new ethers.Contract(getChainConfig().financialContractAddress, EMP_ABI, provider)
+}
+
 export const ethPromise = accountPromise.then(async () => {
     provider = new ethers.providers.Web3Provider(window.ethereum)
     signer = provider.getSigner()
@@ -49,7 +54,7 @@ export const ethPromise = accountPromise.then(async () => {
     // Create contracts
     USDC = new ethers.Contract(getChainConfig().USDC, ERC20, signer)
     uniswapV2Router = new ethers.Contract(getChainConfig().SushiV2Router02, UniswapV2Router02_ABI, signer)
-    financialContract = new ethers.Contract(getChainConfig().financialContractAddress, EMP_ABI, signer)
+    financialContract = createFinancialContract(signer)
     UNISXToken = new ethers.Contract(getChainConfig().UNISXToken, ERC20, signer)
     xUNISXToken = new ethers.Contract(getChainConfig().xUNISXToken, ERC20, signer)
     UNISXStakingRewards = new ethers.Contract(getChainConfig().UNISXStakingRewards, UNISXStakingRewards_ABI, signer)

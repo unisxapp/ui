@@ -27,6 +27,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 
+/* eslint-disable no-unused-vars */
 import { connectMetamask, accountPromise } from "../../core/metamask";
 import { ethPromise } from "../../core/eth";
 import errorStatus from "../../helpers/errors";

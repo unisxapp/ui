@@ -1,10 +1,15 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unreachable */
 /* eslint-disable no-unused-vars */
-import {UNISXDecimals, tokenCurrencyDecimals, financialContract, provider, ethPromise} from '../core/eth.js'
-import {CHAIN_CONFIG, MINTER_REWARD_RATE} from '../core/config.js'
 import { ethers } from 'ethers'
+import {createFinancialContract, getChainConfig, UNISXToken, UNISXDecimals, tokenCurrencyDecimals} from './eth.js'
+import {MINTER_REWARD_RATE} from './config.js'
 
 const BN = ethers.BigNumber.from
+
+
+const provider = new ethers.providers.JsonRpcProvider(getChainConfig().archiveNodeURL)
+const financialContract = createFinancialContract(provider)
 
 // For debug
 function nocached(key, argCount, resultType, fn) {
@@ -44,14 +49,12 @@ async function _contractCreationBlock(address, low, high){
     return low
   }
   const middle = Math.floor((low + high) / 2)
-  
   const code = await provider.getCode(address, middle)
-
   if(code == '0x'){
     return _contractCreationBlock(address, middle + 1, high)
   } else {
     return _contractCreationBlock(address, low, middle)
-  } 
+  }
 }
 
 export const contractCreationBlock = cached('creationBlock', 1, 'int', _contractCreationBlock)
@@ -154,7 +157,6 @@ export async function getRewards({
   blockInterval = [0, Infinity], 
   sponsors,
 }) {
-  await ethPromise
 
   const latest = await provider.getBlockNumber()
   const creationBlock = await contractCreationBlock(financialContract.address, 0, latest)
@@ -256,3 +258,33 @@ export async function getRewards({
   return result
 
 }
+
+export async function getMinterRewardPaid(address) {
+  const latest = await provider.getBlockNumber()
+  const [expirationTimestamp, creationBlock] = await Promise.all([
+    financialContract.expirationTimestamp().then(ts => ts.toNumber()),
+    contractCreationBlock(
+      getChainConfig().financialContractAddress, 
+      0,
+      latest
+    ),
+  ])
+  const creationBlockTimestamp = (await provider.getBlock(creationBlock)).timestamp
+  const [startTime, endTime] = [creationBlockTimestamp, expirationTimestamp]
+    .map(ts => ts + 3600 * 24 * 7 /* one week */)
+  const [startBlock, endBlock] = await Promise.all(
+    [startTime, endTime].map(ts => blockByTimestamp(ts, 0, latest))
+  )
+  // Only select events that are one week later from contract deployment and
+  // one week later after expiration
+  const events = await UNISXToken.queryFilter(
+    UNISXToken.filters.Transfer(getChainConfig().rewardPayer, address),
+    startBlock,
+    endBlock,
+  )
+  return events.reduce(
+    (total, e) => total.add(e.args.amount), 
+    ethers.BigNumber.from(0)
+  )
+}
+
