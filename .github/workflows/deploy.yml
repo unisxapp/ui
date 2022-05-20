@@ -23,5 +23,5 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "public"
-          target: "/tmp"
+          source: "dist"
+          target: "/www/unisx.xyz"

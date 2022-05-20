@@ -32,6 +32,26 @@
             </div>
           </div>
         </div>
+        <div class="flex mb-10 flex-row-2 flex j-between">
+          <div class="input-wrapp">
+            <input
+              type="number"
+              class="mb-10"
+              placeholder="0.000"
+              v-model="fakeTokensAmount"
+              disabled
+              ref="coll"
+            />
+          </div>
+          <div class="input-wrapp">
+            <input
+              type="text"
+              placeholder="Token"
+              :value="selectedItem.CollateralName"
+              disabled
+            />
+          </div>
+        </div>
         <div class="flex flex-row-2 flex j-between align-center">
           <span>Synthetic tokens minted:</span>
           <span class="ml-a">{{
@@ -92,7 +112,7 @@
             class="cancelbut disabled"
             @click="mint"
             ref="mintBtn"
-            :disabled="!synthetic.tokensAmount"
+            :disabled="!synthetic.collateralAmount"
           >
             Mint
           </button>
@@ -129,6 +149,7 @@
             />
           </div>
         </div>
+        <div class="flex mb-10 flex-row-2 flex j-between" style="height:52px;"></div>
         <div class="flex flex-row-2 flex j-between align-center">
           <span>Collateral tokens in the wallet:</span>
           <span class="ml-a">{{
@@ -220,10 +241,8 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 
-// eslint-disable-next-line no-unused-vars
-import { round, toDote, COLLATERAL_PRICE, toFix } from "../../../helpers";
+import { toDote } from "../../../helpers";
 
-// eslint-disable-next-line no-unused-vars
 import {
   collateralByTokenCurrency,
   createPosition,
@@ -282,6 +301,8 @@ export default {
   data() {
     return {
       isInstrumentListUpdated: false,
+      fakeTokensAmount: '',
+      fakeCollateralAmount: ''
     };
   },
   computed: {
@@ -302,14 +323,14 @@ export default {
     },
     selectedItem: function () {
       return this.selectedItemIn;
-    },
+    }
   },
   methods: {
     ...mapActions(["GET_INSTRUMENTS_FROM_API"]),
 
     async mint() {
-      if (this.synthetic.collateralAmount && this.synthetic.tokensAmount) {
-        const collateralAmount = toDote(this.synthetic.tokensAmount);
+      if (this.synthetic.collateralAmount) {
+        const collateralAmount = toDote(this.fakeTokensAmount);
         const tokensAmount = toDote(this.synthetic.collateralAmount);
         const syntheticInWallet =
           this.selectedItemBalance.collateralBalanceFormatted;
@@ -351,8 +372,7 @@ export default {
       if (this.synthetic.tokensAmount) {
         console.log("Deposit");
         const collateralAmount = toDote(this.synthetic.tokensAmount);
-        const tokensAmount = toDote(this.synthetic.collateralAmount);
-        // const syntheticInWallet = this.synthetic.syntheticIntheWallet;
+        const tokensAmount = toDote(this.fakeCollateralAmount);
         const syntheticInWallet =
           this.selectedItemBalance.collateralBalanceFormatted;
 
@@ -386,7 +406,6 @@ export default {
       if (this.synthetic.collateralAmount) {
         console.log("Burn");
         const tokensAmount = toDote(this.synthetic.collateralAmount);
-        // const portfolioAmount = this.selectedItemBalance.tokenCurrencyBalance;
         const portfolioAmount =
           this.selectedItemBalance.collateralAmountFormatted;
         if (+tokensAmount > +portfolioAmount) {
@@ -420,7 +439,6 @@ export default {
       if (this.synthetic.tokensAmount) {
         console.log("Withdraw");
         const collateralAmount = toDote(this.synthetic.tokensAmount);
-        // const collateralInWallet = this.selectedItemBalance.collateralBalanceFormatted;
         const collateralInWallet = this.selectedItemBalance.collateralTokens;
         const collateralAvailableForFastWithdrawal =
           this.selectedItemBalance.collateralAvailableForFastWithdrawal;
@@ -499,22 +517,14 @@ export default {
         case "synt":
           this.synthetic.collateralAmount =
             this.selectedItemBalance.collateralAmountFormatted;
-          // this.$refs.synt.value = this.synthetic.collateralAmount;
           this.consider("collateralAmount");
           this.$forceUpdate();
-          // this.$refs.coll.value = this.synthetic.tokensAmount;
-          // this.$refs.mintBtn.disabled = '';
-          // this.$refs.burnBtn.disabled = '';
           break;
         case "coll":
           this.synthetic.tokensAmount =
             this.selectedItemBalance.collateralBalanceFormatted;
-          // this.$refs.coll.value = this.synthetic.tokensAmount;
           this.consider("tokensAmount");
           this.$forceUpdate();
-          // this.$refs.synt.value = this.synthetic.collateralAmount;
-          // this.$refs.mintBtn.disabled = false;
-          // this.$refs.burnBtn.disabled = false;
           break;
       }
     },
@@ -522,12 +532,14 @@ export default {
     consider(e) {
       switch (e) {
         case "collateralAmount":
-          this.synthetic.tokensAmount =
-            this.toPrice(e) !== "0" ? this.toPrice(e) : "";
+          // this.synthetic.tokensAmount =
+          //   this.toPrice(e) !== "0" ? this.toPrice(e) : "";
+          this.fakeTokensAmount = this.toPrice(e) !== "0" ? this.toPrice(e) : "";
           this.$forceUpdate();
           break;
         case "tokensAmount":
-          this.synthetic.collateralAmount = this.toPrice(e);
+          // this.synthetic.collateralAmount = this.toPrice(e);
+          this.fakeCollateralAmount = this.toPrice(e);
           this.$forceUpdate();
           break;
       }
@@ -536,12 +548,10 @@ export default {
     toPrice(token) {
       switch (token) {
         case "collateralAmount":
-          // return round((toDote(this.synthetic.collateralAmount) * this.synthetic.cr * (this.INSTRUMENTS[0].Price / COLLATERAL_PRICE)), 4).toString();
           return this.synthetic.collateralAmount
             ? collateralByTokenCurrency(this.synthetic.collateralAmount)
             : "";
         case "tokensAmount":
-          // return round((toDote(this.synthetic.tokensAmount) / this.synthetic.cr * (COLLATERAL_PRICE / this.INSTRUMENTS[0].Price)), 4).toString();
           return this.synthetic.tokensAmount
             ? tokenCurrencyByCollateral(this.synthetic.tokensAmount)
             : "";
@@ -557,6 +567,12 @@ export default {
     if (this.instrumentsList.length && !this.isInstrumentListUpdated) {
       window.$("select").niceSelect("update");
       this.isInstrumentListUpdated = true;
+    }
+    if (!this.synthetic.collateralAmount) {
+      this.fakeTokensAmount = '';
+    }
+    if (!this.synthetic.tokensAmount) {
+      this.fakeCollateralAmount = '';
     }
   },
 };
