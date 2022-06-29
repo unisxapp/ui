@@ -190,7 +190,8 @@ export async function getAccount(account = window.ethereum.selectedAddress){
     UNISXBalance: UNISXToken.balanceOf(account),
     xUNISXBalance: xUNISXToken.balanceOf(account),
     UNISXStaked: getUNISXStaked(account),
-    UNISXRewardEarned: UNISXStakingRewards.callStatic.getReward({from: account}),
+    // UNISXRewardEarned: UNISXStakingRewards.callStatic.getReward({from: account}),
+    UNISXRewardEarned: UNISXStakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
     UNISXRewardPaid: getRewardPaid(account, UNISXStakingRewards),
   })
 
@@ -626,8 +627,11 @@ async function getPairProperties(account, token, pair, stakingRewards) {
     !pair.address ? ethers.BigNumber.from(1) : pair.totalSupply(),
     token.balanceOf(account),
     USDC.balanceOf(account),
-    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards._balances(account),
-    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
+    // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards._balances(account),
+    // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.earned(getChainConfig().LPStakingRewardsFactory),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.rewards(account),
+    // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : getRewardPaid(account, stakingRewards),
   ])
 
