@@ -365,7 +365,7 @@ export default {
                 T = await financialContract
                   .expirationTimestamp()
                   .then((ts) => ts.toNumber());
-                T = new Date(T + 7200);
+                T = new Date(T * 1000);
                 this.handleShowMessage(
                   errorStatus("mintExpired", T.toLocaleString())
                 );
