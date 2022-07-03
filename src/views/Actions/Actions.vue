@@ -370,6 +370,7 @@ export default {
                   errorStatus("mintExpired", T.toLocaleString())
                 );
                 this.synthetic.isOracle = false;
+                if (contractProperties.isExpirationPriceReceived) this.synthetic.isOracle = true;
                 break;
               case 2:
                 this.handleShowMessage(errorStatus("setExpired"));
