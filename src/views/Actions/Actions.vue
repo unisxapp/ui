@@ -370,7 +370,8 @@ export default {
                   errorStatus("mintExpired", T.toLocaleString())
                 );
                 this.synthetic.isOracle = false;
-                if (contractProperties.isExpirationPriceReceived) this.synthetic.isOracle = true;
+                if (contractProperties.isExpirationPriceReceived)
+                  this.synthetic.isOracle = true;
                 break;
               case 2:
                 this.handleShowMessage(errorStatus("setExpired"));
@@ -497,6 +498,14 @@ export default {
     ]),
 
     portfolioList: function () {
+      console.log("Position: ", this.POSITION);
+      console.log("Account: ", this.ACCOUNT);
+      console.log("Pool properties: ", this.POOL_PROPERTIES);
+      console.log(
+        "Financial contract properties: ",
+        this.FINANCIAL_CONTRACT_PROPERTIES
+      );
+
       const portfolio = [];
 
       const uSPAC10_PRICE = this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted

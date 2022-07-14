@@ -8,7 +8,10 @@ export async function getPrice() {
 // eslint-disable-next-line no-unused-vars
 export async function getHistoricalPrice(timestamp) {
   return await fetchAPI('historicalPrice/uSPAC10?timestamp=' + timestamp)
-    .then(resp => resp.price)
+    .then(resp => {
+      if (resp && resp.price) return resp.price
+      return 0
+    })
 
   // return '29.241';
 }
