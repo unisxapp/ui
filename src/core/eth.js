@@ -633,7 +633,8 @@ async function getPairProperties(account, token, pair, stakingRewards) {
     // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.rewards(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.balanceOf(account),
     // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.getReward({from: account}),
-    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
+    // ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
+    ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : stakingRewards.callStatic.earned(account),
     ethers.BigNumber.from(stakingRewards.address).isZero() ? ethers.BigNumber.from(0) : getRewardPaid(account, stakingRewards),
   ])
 
