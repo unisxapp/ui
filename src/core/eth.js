@@ -269,7 +269,7 @@ export async function getFinancialContractProperties(){
     tokenCurrencyDecimals,
     collateralTokenAddress,
     collateralTokenDecimals,
-    expiryPrice: financialContract.expiryPrice(), //                               PRICE OF EXPIRATION
+    expiryPrice: financialContract.expiryPrice(), // PRICE OF EXPIRATION
     totalTokensOutstanding: financialContract.totalTokensOutstanding(),
     totalPositionCollateral: financialContract.totalPositionCollateral().then(
       ({rawValue}) => rawValue
@@ -304,7 +304,7 @@ export async function getFinancialContractProperties(){
   return {...props,
     isExpired: expirationState.isExpired,
     isExpirationPriceReceived: expirationState.isExpirationPriceReceived,
-    expiryPriceFormatted: formatUnits(props.expiryPrice, 2), //                                                    EXPIRITY PRICE FORMATTING
+    expiryPriceFormatted: ethers.utils.formatEther(props.expiryPrice), // EXPIRITY PRICE FORMATTING
     totalTokensOutstandingFormatted: formatUnits(props.totalTokensOutstanding, props.tokenCurrencyDecimals),
     totalPositionCollateralFormatted: formatUnits(props.totalPositionCollateral, props.collateralTokenDecimals),
     minSponsorTokensFormatted: formatUnits(props.minSponsorTokens, props.collateralTokenDecimals),

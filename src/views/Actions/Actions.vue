@@ -273,7 +273,7 @@ export default {
       const contractProperties = this.FINANCIAL_CONTRACT_PROPERTIES;
       const uSPAC10_PRICE = +contractProperties.priceFormatted
         ? +contractProperties.priceFormatted
-        : 0;
+        : +contractProperties.expiryPriceFormatted;
       const poolProperties = this.POOL_PROPERTIES;
       const collateralRatio =
         +collateralAmount.collateralAmountFormatted /
@@ -508,9 +508,9 @@ export default {
 
       const portfolio = [];
 
-      const uSPAC10_PRICE = this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted
+      const uSPAC10_PRICE = +this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted
         ? this.FINANCIAL_CONTRACT_PROPERTIES.priceFormatted
-        : 0;
+        : this.FINANCIAL_CONTRACT_PROPERTIES.expiryPriceFormatted;
 
       const instumentsJSON = this.INSTRUMENTS.map((instrument) => {
         return {
