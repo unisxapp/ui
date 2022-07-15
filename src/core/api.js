@@ -8,6 +8,6 @@ export function fetchAPI(path, data) {
         body: JSON.stringify(data),
       }).then(resp => resp.json()).catch(() => alert("The price server is unavailable, try again later."))
     } else {
-      return fetch(BASE_PATH + path).then(resp => resp.json()).catch(() => alert("The price server is unavailable, try again later."))
+      return fetch(BASE_PATH + path).then(resp => resp.json()).catch(() => console.warn("The price server is unavailable, try again later."))
     }
 }
