@@ -192,7 +192,8 @@ export async function getAccount(account = window.ethereum.selectedAddress){
     // UNISXStaked: getUNISXStaked(account),
     UNISXStaked: UNISXStakingRewards.balanceOf(account),
     // UNISXRewardEarned: UNISXStakingRewards.callStatic.getReward({from: account}),
-    UNISXRewardEarned: UNISXStakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
+    // UNISXRewardEarned: UNISXStakingRewards.callStatic.earned(getChainConfig().UNISXStakingRewards),
+    UNISXRewardEarned: UNISXStakingRewards.callStatic.earned(account),
     UNISXRewardPaid: getRewardPaid(account, UNISXStakingRewards),
   })
 
