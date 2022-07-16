@@ -144,9 +144,9 @@ export default {
       const financialContractProperties =
         await getFinancialContractProperties();
 
-      this.todayPriceValue = financialContractProperties.priceFormatted
+      this.todayPriceValue = +financialContractProperties.priceFormatted
         ? financialContractProperties.priceFormatted
-        : "1";
+        : financialContractProperties.expiryPriceFormatted;
 
       const liquidationPrice = collateralAmount.liquidationPriceFormatted
         ? collateralAmount.liquidationPriceFormatted
