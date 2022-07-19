@@ -494,14 +494,7 @@ async function* ensureAllowance(
   const allowance = await contract.allowance(address, to)
   if(allowance.lt(amount)){
     yield {message: 'Sending approve transaction'}
-  //if to = UNISX
-  // {
-  //   const approveTx = await contract.approve(to, 115792089237316195423570985008687907853269984665640564039457584007913129639935)
-  // }
-  // else
-  // {
        const approveTx = await contract.approve(to, amount)
-  // }
        yield {message: 'Waiting for approve transaction', txHash: approveTx.hash}
     await approveTx.wait()
   }
