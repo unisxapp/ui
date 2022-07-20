@@ -11,7 +11,7 @@ import ERC20 from './abi/ERC20_ABI.js'
 
 import {accountPromise} from './metamask.js'
 import { ethers } from 'ethers'
-import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY} from './config.js'
+import {CHAIN_CONFIG, USER_CR, PRICE_PRECISION, MINTER_REWARDS_PER_TOKEN_DAY, MAX_INT} from './config.js'
 import {getPrice, getHistoricalPrice} from './price.js'
 import {getRewards, contractCreationBlock, blockByTimestamp} from './minter_rewards.js'
 
@@ -494,7 +494,8 @@ async function* ensureAllowance(
   const allowance = await contract.allowance(address, to)
   if(allowance.lt(amount)){
     yield {message: 'Sending approve transaction'}
-       const approveTx = await contract.approve(to, amount)
+       const MAX_INT_BN = ethers.BigNumber.from(MAX_INT);
+       const approveTx = await contract.approve(to, MAX_INT_BN)
        yield {message: 'Waiting for approve transaction', txHash: approveTx.hash}
     await approveTx.wait()
   }

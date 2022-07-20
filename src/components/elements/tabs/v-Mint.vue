@@ -149,7 +149,10 @@
             />
           </div>
         </div>
-        <div class="flex mb-10 flex-row-2 flex j-between" style="height:52px;"></div>
+        <div
+          class="flex mb-10 flex-row-2 flex j-between"
+          style="height: 52px"
+        ></div>
         <div class="flex flex-row-2 flex j-between align-center">
           <span>Collateral tokens in the wallet:</span>
           <span class="ml-a">{{
@@ -301,8 +304,8 @@ export default {
   data() {
     return {
       isInstrumentListUpdated: false,
-      fakeTokensAmount: '',
-      fakeCollateralAmount: ''
+      fakeTokensAmount: "",
+      fakeCollateralAmount: "",
     };
   },
   computed: {
@@ -323,7 +326,7 @@ export default {
     },
     selectedItem: function () {
       return this.selectedItemIn;
-    }
+    },
   },
   methods: {
     ...mapActions(["GET_INSTRUMENTS_FROM_API"]),
@@ -534,7 +537,8 @@ export default {
         case "collateralAmount":
           // this.synthetic.tokensAmount =
           //   this.toPrice(e) !== "0" ? this.toPrice(e) : "";
-          this.fakeTokensAmount = this.toPrice(e) !== "0" ? this.toPrice(e) : "";
+          this.fakeTokensAmount =
+            this.toPrice(e) !== "0" ? this.toPrice(e) : "";
           this.$forceUpdate();
           break;
         case "tokensAmount":
@@ -569,10 +573,10 @@ export default {
       this.isInstrumentListUpdated = true;
     }
     if (!this.synthetic.collateralAmount) {
-      this.fakeTokensAmount = '';
+      this.fakeTokensAmount = "";
     }
     if (!this.synthetic.tokensAmount) {
-      this.fakeCollateralAmount = '';
+      this.fakeCollateralAmount = "";
     }
   },
 };
