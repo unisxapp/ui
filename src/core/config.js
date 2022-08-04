@@ -35,9 +35,9 @@ export const MINTER_REWARD_RATE = BigInt(Number(100_000n) * (Number(10n) ** Numb
 
 export const USER_CR = '1.5'
 
-export const BASKET = ["DWAC", "IRDM", "MP", "PRIM", "WSC", "SMPL", "TGLS", "CERE", "KW", "ROIC"]
+export const BASKET = ["DWAC", "IRDM", "MP", "PRIM", "WSC", "SMPL", "TGLS", "CERE", "KW", "HPK"]
 
-export const CORRECTION_FACTOR = '1.0'
+export const CORRECTION_FACTOR = '0,95951'
 
 export const MINTER_REWARDS_PER_TOKEN_DAY = 1
 
