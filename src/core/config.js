@@ -1,7 +1,7 @@
 export const CHAIN_CONFIG = {
   // Ethereum Main Network
   1: {
-    financialContractAddress: "0x89477Dd602f69c59Eb6B8e5C059F041a32ae4017",
+    financialContractAddress: "0xC75dd1b2A04d5aFF1E2779Ccc5624174a2c8cb7f",
     UNISXToken: "0xDD641511cE248fF136095aa49A02FeF18CBbfc2A",
     xUNISXToken: "0x620E2898bd7bb7910Ef7b5B03A256F5c2DEe2Ccd",
     LPStakingRewardsFactory: "0x258B8aDeaB570A57F87864a3273A59Aa7DEcAD18", 
