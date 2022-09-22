@@ -101,10 +101,11 @@ export const ethPromise = accountPromise.then(async () => {
           ),
           pricePromise,
         ])
+
         GCR = 
           ethers.FixedNumber.from(totalPositionCollateral.toString())
           .divUnsafe(
-            ethers.FixedNumber.from(totalTokensOutstanding.toString())
+            ethers.FixedNumber.from(ethers.FixedNumber.from(totalTokensOutstanding).isZero() ? ethers.FixedNumber.from(1).toString() : totalTokensOutstanding.toString())
           )
           .divUnsafe(ethers.FixedNumber.from(price).isZero() ? ethers.FixedNumber.from(1) : price)
       })(),

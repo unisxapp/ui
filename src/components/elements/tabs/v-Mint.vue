@@ -76,7 +76,7 @@
               {{
                 (
                   +synthetic.price *
-                  selectedItemBalance.collateralAmountFormatted
+                  +selectedItemBalance.collateralAmountFormatted
                 ).toFixed(5) || "0.0000"
               }}
             </span>
